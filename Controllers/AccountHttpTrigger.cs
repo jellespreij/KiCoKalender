@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KiCoKalender.Startup
+namespace KiCoKalender.Controllers
 {
-    class Startup
+    class AccountHttpTrigger
     {
     }
 }
