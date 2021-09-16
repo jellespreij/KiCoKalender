@@ -8,7 +8,7 @@ namespace KiCoKalender.Configurations {
 	public class OpenApiConfigurationOptions : DefaultOpenApiConfigurationOptions {
 		public override OpenApiInfo Info { get; set; } = new OpenApiInfo() {
 			Version = "3.0.0",
-			Title = "PetStore example for .NET 5",
+			Title = "KiCoKalender project for project cloud",
 			Description = "An example of how to set up a .NET 5 Azure Functions project with OpenAPI support.",
 			TermsOfService = new Uri("https://github.com/Azure/azure-functions-openapi-extension"),
 			Contact = new OpenApiContact() {
