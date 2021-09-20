@@ -19,7 +19,7 @@ namespace KiCoKalender.Repository
             this.cloudTable = cloudTable;
         }
 
-        public async Task<User> GetUserById(string userId) 
+        public async Task<User> GetUserById(long? userId) 
         {
             TableOperation tableOperation = TableOperation.Retrieve<User>("partitionKey", "RowKey");
             TableResult tableResult = await cloudTable.ExecuteAsync(tableOperation);

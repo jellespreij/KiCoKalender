@@ -10,7 +10,7 @@ namespace KiCoKalender.Interfaces
 {
     public interface IUserService
     {
-        Task<User> GetUserById(string userId);
+        Task<User> GetUserById(long? userId);
         void AddUser(User user);
         Task<User> GetUserByRole(Role role);
     }

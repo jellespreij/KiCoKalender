@@ -19,7 +19,7 @@ namespace KiCoKalender.Service
             this.UserRepository = userRepository;
         }
 
-        public async Task<User> GetUserById(string userId)
+        public async Task<User> GetUserById(long? userId)
         {
             return await UserRepository.GetUserById(userId);
         }

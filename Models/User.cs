@@ -12,7 +12,7 @@ namespace KiCoKalender.Models
     public class User : TableEntity
     {
         [OpenApiProperty(Description = "Gets or sets the parent ID.")]
-        public string userId { get; set; }
+        public long? userId { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the first name.")]
         [JsonRequired]
@@ -31,15 +31,15 @@ namespace KiCoKalender.Models
         
         }
 
-        public User(string userId, string userFirstName, string userLastName, Role userRole)
+        public User(long? userId, string userFirstName, string userLastName, Role userRole)
         {
             this.userId = userId;
             this.userFirstName = userFirstName;
             this.userLastName = userLastName;
             this.userRole = userRole;
 
-            PartitionKey = userId;
-            RowKey = userLastName + userFirstName;
+            //PartitionKey = userId;
+            //RowKey = userLastName + userFirstName;
         }
     }
 
@@ -47,8 +47,8 @@ namespace KiCoKalender.Models
     {
         public override IOpenApiExample<User> Build(NamingStrategy NamingStrategy = null)
         {
-            Examples.Add(OpenApiExampleResolver.Resolve("Dirk", "This is Dirk's summary",new User() { userId = "33", userFirstName = "Dirk", userLastName = "Dirksma", userRole = Role.Parent}, NamingStrategy));
-            Examples.Add(OpenApiExampleResolver.Resolve("Jan", "This is Jan's summary", new User() { userId = "34", userFirstName = "Jan", userLastName = "Jansma", userRole = Role.Parent }, NamingStrategy));
+            Examples.Add(OpenApiExampleResolver.Resolve("Dirk", "This is Dirk's summary",new User() { userId = 33, userFirstName = "Dirk", userLastName = "Dirksma", userRole = Role.Parent}, NamingStrategy));
+            Examples.Add(OpenApiExampleResolver.Resolve("Jan", "This is Jan's summary", new User() { userId = 34, userFirstName = "Jan", userLastName = "Jansma", userRole = Role.Parent }, NamingStrategy));
     
             return this;
         }
