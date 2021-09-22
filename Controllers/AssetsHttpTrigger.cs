@@ -11,7 +11,6 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using System.IO;
 using Newtonsoft.Json;
-using KiCoKalender.Service;
 using KiCoKalender.Interfaces;
 
 namespace KiCoKalender.Controllers
@@ -19,47 +18,47 @@ namespace KiCoKalender.Controllers
     class AssetsHttpTrigger
     {
 		ILogger Logger { get; }
-		IUserService UserService { get; }
+		IAssetService AssetService { get; }
 
-		public AssetsHttpTrigger(ILogger<AssetsHttpTrigger> Logger, IUserService userService)
+		public AssetsHttpTrigger(ILogger<AssetsHttpTrigger> Logger, IAssetService AssetService)
 		{
 			this.Logger = Logger;
-			this.UserService = userService;
+			this.AssetService = AssetService;
 		}
 
-		[Function(nameof(AssetsHttpTrigger.GetAssetById))]
-		[OpenApiOperation(operationId: "GetAssetById", tags: new[] { "asset" }, Summary = "Find asset by ID", Description = "Returns a Asset.", Visibility = OpenApiVisibilityType.Important)]
+		[Function(nameof(AssetsHttpTrigger.FindByUserID))]
+		[OpenApiOperation(operationId: "FindByUserID", tags: new[] { "asset" }, Summary = "Find asset by userId", Description = "Returns assets by userId.", Visibility = OpenApiVisibilityType.Important)]
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
-		[OpenApiParameter(name: "assetId", In = ParameterLocation.Path, Required = true, Type = typeof(long?), Summary = "ID of Asset to return", Description = "ID of Asset to return", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "successful operation", Description = "successful operation")]
+		[OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(long?), Summary = "userId of Assets to return", Description = "userId of Assets to return", Visibility = OpenApiVisibilityType.Important)]
+		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyAssetExample))]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
-		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Asset not found", Description = "Asset not found")]
-		public async Task<HttpResponseData> GetAssetById(
+		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Assets not found", Description = "Assets not found")]
+		public async Task<HttpResponseData> FindByUserID(
 			[HttpTrigger(AuthorizationLevel.Function,
-			"GET", Route = "asset/{assetId}")]
+			"GET", Route = "asset/{userId}")]
 			HttpRequestData req,
-			long? assetId,
+			long? userId,
 			FunctionContext executionContext)
 		{
 			// Generate output
 			HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-			if (assetId.HasValue)
+			if (!userId.HasValue)
 			{
 				response = req.CreateResponse(HttpStatusCode.BadRequest);
 			}
 			else
 			{
-				//await response.WriteAsJsonAsync(AssetsService.GetAssetsById(assetId));
+				await response.WriteAsJsonAsync(AssetService.FindAssetByUserId(userId));
 			}
 
 			return response;
 		}
 
 		[Function(nameof(AssetsHttpTrigger.AddAsset))]
-		[OpenApiOperation(operationId: "addAsset", tags: new[] { "asset" }, Summary = "Add a asset to the KiCoKalender", Description = "This adds a asset to the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
+		[OpenApiOperation(operationId: "addAsset", tags: new[] { "asset" }, Summary = "Add an asset to the KiCoKalender", Description = "This adds an asset to the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
-		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be added to the KiCoKalender")]
+		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be added to the KiCoKalender", Example = typeof(DummyAssetExample))]
 		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "New asset added", Description = "New asset added")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Invalid input", Description = "Invalid input")]
 		public async Task<HttpResponseData> AddAsset(
@@ -81,17 +80,17 @@ namespace KiCoKalender.Controllers
 			}
 			else
 			{
-				//UserService.AddAsset(asset);
+				AssetService.AddAsset(asset);
 			}
 
 			return response;
 		}
 
 		[Function(nameof(AssetsHttpTrigger.DeleteAsset))]
-		[OpenApiOperation(operationId: "deleteAsset", tags: new[] { "asset" }, Summary = "Deletes a asset to the KiCoKalender", Description = "This Deletes an asset to the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
+		[OpenApiOperation(operationId: "deleteAsset", tags: new[] { "asset" }, Summary = "Deletes an asset from the KiCoKalender", Description = "This Deletes an asset from the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
-		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be Deleted from the KiCoKalender")]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(User), Summary = "New asset Delete", Description = "Asset deleted")]
+		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be Deleted from the KiCoKalender", Example = typeof(DummyAssetExample))]
+		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(User), Summary = "Asset Deleted", Description = "Asset deleted")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Invalid input", Description = "Invalid input")]
 		public async Task<HttpResponseData> DeleteAsset(
 			[HttpTrigger(AuthorizationLevel.Function,
@@ -112,7 +111,7 @@ namespace KiCoKalender.Controllers
 			}
 			else
 			{
-				//UserService.AddAsset(asset);
+				AssetService.DeleteAsset(asset);
 			}
 
 			return response;
@@ -122,7 +121,7 @@ namespace KiCoKalender.Controllers
 		[OpenApiOperation(operationId: "updateAsset", tags: new[] { "asset" }, Summary = "Update an existing Asset", Description = "This updates an existing Asset.", Visibility = OpenApiVisibilityType.Important)]
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
 		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be updated")]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "Asset details updated", Description = "Asset details updated")]
+		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "Asset details updated", Description = "Asset details updated", Example = typeof(DummyAssetExample))]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Asset not found", Description = "Asset not found")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Validation exception", Description = "Validation exception")]
@@ -138,35 +137,46 @@ namespace KiCoKalender.Controllers
 			// Generate output
 			HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
+			if (asset == null)
+			{
+				response = req.CreateResponse(HttpStatusCode.BadRequest);
+			}
+			else
+			{
+				AssetService.UpdateAsset(asset);
+			}
+
 			await response.WriteAsJsonAsync(asset);
 
 			return response;
 		}
 
-		[Function(nameof(AssetsHttpTrigger.GetAssetByAssetEnum))]
-		[OpenApiOperation(operationId: "GetAssetByAssetEnum", tags: new[] { "asset" }, Summary = "Find asset by ID", Description = "Returns a Asset.", Visibility = OpenApiVisibilityType.Important)]
+		[Function(nameof(AssetsHttpTrigger.FindByAssetEnum))]
+		[OpenApiOperation(operationId: "FindByAssetEnum", tags: new[] { "asset" }, Summary = "Find assets of user by assetEnum", Description = "Returns assets of user by assetEnum.", Visibility = OpenApiVisibilityType.Important)]
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
-		[OpenApiParameter(name: "assetsEnum", In = ParameterLocation.Path, Required = true, Type = typeof(List<AssetsEnum>), Summary = "AssetEnum of Asset to return", Description = "AssetEnum of Asset to return", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "successful operation", Description = "successful operation")]
+		[OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(long?), Summary = "userId of Asset to return", Description = "userId of Asset to return", Visibility = OpenApiVisibilityType.Important)]
+		[OpenApiParameter(name: "assetsEnum", In = ParameterLocation.Query, Required = true, Type = typeof(List<AssetsEnum>), Summary = "AssetEnum of Asset to return", Description = "AssetEnum of Asset to return", Visibility = OpenApiVisibilityType.Important)]
+		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyAssetExample))]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid assetEnum supplied", Description = "Invalid AssetEnum supplied")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Asset not found", Description = "Asset not found")]
-		public async Task<HttpResponseData> GetAssetByAssetEnum(
+		public async Task<HttpResponseData> FindByAssetEnum(
 			[HttpTrigger(AuthorizationLevel.Function,
-			"GET", Route = "asset/GetAssetByAssetEnum")]
+			"GET", Route = "asset/{userId}/findByAssetEnum")]
 			HttpRequestData req,
+			long? userId,
 			AssetsEnum assetsEnum,
 			FunctionContext executionContext)
 		{
 			// Generate output
 			HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-			if (!System.Enum.IsDefined(typeof(AssetsEnum), assetsEnum))
+			if (!System.Enum.IsDefined(typeof(AssetsEnum), assetsEnum) || userId.HasValue)
 			{
 				response = req.CreateResponse(HttpStatusCode.BadRequest);
 			}
 			else
 			{
-				//await response.WriteAsJsonAsync(AssetsService.GetAssetsById(assetId));
+				await response.WriteAsJsonAsync(AssetService.FindByAssetsEnum(userId, assetsEnum));
 			}
 
 			return response;

@@ -1,4 +1,6 @@
-﻿using KiCoKalender.Models;
+﻿using KiCoKalender.Controllers;
+using KiCoKalender.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
@@ -12,32 +14,40 @@ namespace KiCoKalender.Repository
 {
     class UserRepository
     {
-        public CloudTable cloudTable;
+        ILogger Logger { get; }
 
-        public UserRepository(CloudTable cloudTable) 
+        public UserRepository(ILogger<UserHttpTrigger> Logger) 
         {
-            this.cloudTable = cloudTable;
+            this.Logger = Logger;
         }
 
-        public async Task<User> GetUserById(long? userId) 
+        public async Task<User> FindUserById(long? userId) 
         {
-            TableOperation tableOperation = TableOperation.Retrieve<User>("partitionKey", "RowKey");
-            TableResult tableResult = await cloudTable.ExecuteAsync(tableOperation);
-            return tableResult.Result as User;
+            User user = new User() { userId = 33, userName = "Dirk Dirskma", userRole = Role.Parent };
+            Logger.LogInformation("Found user by id: ", userId);
+
+            return user;
         }
 
         public async void AddUser(User user) 
         {
-            TableOperation tableOperation = TableOperation.Insert(user);
-            TableResult result = await cloudTable.ExecuteAsync(tableOperation);
-            User insertedUser = result.Result as User;
+            Logger.LogInformation("Inserted user");
         }
 
-        public async Task<User> GetUserByRole(Role role) 
+        public async Task<User> FindUserByName(string name) 
         {
-            TableOperation tableOperation = TableOperation.Retrieve<User>("partitionKey", "RowKey");
-            TableResult tableResult = await cloudTable.ExecuteAsync(tableOperation);
-            return tableResult.Result as User;
+            User user = new User() { userId = 33, userName = "Dirk Dirksma", userRole = Role.Parent };
+            Logger.LogInformation("Found user by name: ", name);
+
+            return user;
+        }
+        public async void UpdateUser(User user)
+        {
+            Logger.LogInformation("Updated user");
+        }
+        public async void DeleteUser(User user)
+        {
+            Logger.LogInformation("Deleted user");
         }
     }
 }

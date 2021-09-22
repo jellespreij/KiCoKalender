@@ -19,53 +19,24 @@ namespace KiCoKalender.Controllers
     class AppointmentHttpTrigger
     {
         ILogger Logger { get; }
-        IAppointmentService IAppointmentService { get; }
+        IAppointmentService AppointmentService { get; }
 
-        public AppointmentHttpTrigger(ILogger<UserHttpTrigger> Logger, IAppointmentService appointmentService)
+        public AppointmentHttpTrigger(ILogger<UserHttpTrigger> Logger, IAppointmentService AppointmentService)
         {
             this.Logger = Logger;
-            this.IAppointmentService = appointmentService;
+            this.AppointmentService = AppointmentService;
         }
 
-		[Function(nameof(AppointmentHttpTrigger.GetAppointmentsByAppointsmentId))]
-		[OpenApiOperation(operationId: "GetAppointmentsByAppointsmentId", tags: new[] { "appointment" }, Summary = "Find appointment by appointmentId", Description = "Returns an appointment.", Visibility = OpenApiVisibilityType.Important)]
-		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
-		[OpenApiParameter(name: "appointmentId", In = ParameterLocation.Path, Required = true, Type = typeof(long?), Summary = "appointmentId for appointments to return", Description = "appointmentId for appointments to return", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Appointment), Summary = "successful operation", Description = "successful operation")]
-		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
-		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "appointment not found", Description = "appointment not found")]
-		public async Task<HttpResponseData> GetAppointmentsByAppointsmentId(
-			[HttpTrigger(AuthorizationLevel.Function,
-			"GET", Route = "appointment/{appointmentId}")]
-			HttpRequestData req,
-			long? appointmentId,
-			FunctionContext executionContext)
-		{
-			// Generate output
-			HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
-
-			if (appointmentId.HasValue)
-			{
-				response = req.CreateResponse(HttpStatusCode.BadRequest);
-			}
-			else
-			{
-				//await response.WriteAsJsonAsync(AssetsService.GetAssetsById(assetId));
-			}
-
-			return response;
-		}
-
-		[Function(nameof(AppointmentHttpTrigger.GetAppointmentsByUserId))]
-		[OpenApiOperation(operationId: "GetAppointmentsByUserId", tags: new[] { "appointment" }, Summary = "Find appointment by userId", Description = "Returns an appointment.", Visibility = OpenApiVisibilityType.Important)]
+		[Function(nameof(AppointmentHttpTrigger.FindByUserId2))]
+		[OpenApiOperation(operationId: "FindByUserId2", tags: new[] { "appointment" }, Summary = "Find appointment by userId", Description = "Returns an appointment.", Visibility = OpenApiVisibilityType.Important)]
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
 		[OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(long?), Summary = "userId for appointments to return", Description = "userId for appointments to return", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Appointment), Summary = "successful operation", Description = "successful operation")]
+		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Appointment), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyAppointmentExample))]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "User not found", Description = "User not found")]
-		public async Task<HttpResponseData> GetAppointmentsByUserId(
+		public async Task<HttpResponseData> FindByUserId2(
 			[HttpTrigger(AuthorizationLevel.Function,
-			"GET", Route = "appointment/GetAppointmentsByUserId")]
+			"GET", Route = "appointment/{userId}")]
 			HttpRequestData req,
 			long? userId,
 			FunctionContext executionContext)
@@ -73,13 +44,13 @@ namespace KiCoKalender.Controllers
 			// Generate output
 			HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-			if (userId.HasValue)
+			if (!userId.HasValue)
 			{
 				response = req.CreateResponse(HttpStatusCode.BadRequest);
 			}
 			else
 			{
-				//await response.WriteAsJsonAsync(AssetsService.GetAssetsById(assetId));
+				await response.WriteAsJsonAsync(AppointmentService.FindByUserId(userId));
 			}
 
 			return response;
@@ -89,7 +60,7 @@ namespace KiCoKalender.Controllers
 		[OpenApiOperation(operationId: "AddAppointment", tags: new[] { "appointment" }, Summary = "Add an appointment to the KiCoKalender", Description = "This adds an appointment to the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
 		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Appointment), Required = true, Description = "Appointment object that needs to be added to the KiCoKalender")]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Appointment), Summary = "New appointment added", Description = "New appointment added")]
+		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Appointment), Summary = "New appointment added", Description = "New appointment added", Example = typeof(DummyAppointmentExample))]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Invalid input", Description = "Invalid input")]
 		public async Task<HttpResponseData> AddAppointment(
 			[HttpTrigger(AuthorizationLevel.Function,
@@ -110,7 +81,7 @@ namespace KiCoKalender.Controllers
 			}
 			else
 			{
-				//UserService.AddAsset(asset);
+				AppointmentService.AddAppointment(appointment);
 			}
 
 			return response;
@@ -120,7 +91,7 @@ namespace KiCoKalender.Controllers
 		[OpenApiOperation(operationId: "deleteAppointment", tags: new[] { "appointment" }, Summary = "Deletes an appointment from the KiCoKalender", Description = "This Deletes an appointment from the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
 		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Appointment), Required = true, Description = "appointment object that needs to be Deleted from the KiCoKalender")]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Appointment), Summary = "New apointment Delete", Description = "appointment deleted")]
+		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Appointment), Summary = "New apointment Delete", Description = "appointment deleted", Example = typeof(DummyAppointmentExample))]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Invalid input", Description = "Invalid input")]
 		public async Task<HttpResponseData> DeleteAppointment(
 			[HttpTrigger(AuthorizationLevel.Function,
@@ -141,7 +112,7 @@ namespace KiCoKalender.Controllers
 			}
 			else
 			{
-				//UserService.AddAsset(asset);
+				AppointmentService.DeleteAppointment(appointment);
 			}
 
 			return response;
@@ -151,7 +122,7 @@ namespace KiCoKalender.Controllers
 		[OpenApiOperation(operationId: "updateAppointment", tags: new[] { "appointment" }, Summary = "Update an existing appointment", Description = "This updates an existing appointment.", Visibility = OpenApiVisibilityType.Important)]
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
 		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Appointment), Required = true, Description = "appointment object that needs to be updated")]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Appointment), Summary = "appointment details updated", Description = "appointment details updated")]
+		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Appointment), Summary = "appointment details updated", Description = "appointment details updated", Example = typeof(DummyAppointmentExample))]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid appointment supplied", Description = "Invalid appointment supplied")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "appointment not found", Description = "Appointment not found")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Validation exception", Description = "Validation exception")]
@@ -166,6 +137,15 @@ namespace KiCoKalender.Controllers
 
 			// Generate output
 			HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
+
+			if (appointment == null)
+			{
+				response = req.CreateResponse(HttpStatusCode.BadRequest);
+			}
+			else
+			{
+				AppointmentService.UpdateAppointment(appointment);
+			}
 
 			await response.WriteAsJsonAsync(appointment);
 

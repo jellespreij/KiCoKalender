@@ -11,7 +11,6 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using System.IO;
 using Newtonsoft.Json;
-using KiCoKalender.Service;
 using KiCoKalender.Interfaces;
 
 namespace KiCoKalender.Controllers
@@ -21,20 +20,20 @@ namespace KiCoKalender.Controllers
         ILogger Logger { get; }
 		IUserService UserService { get; }
 
-        public UserHttpTrigger(ILogger<UserHttpTrigger> Logger, IUserService userService)
+        public UserHttpTrigger(ILogger<UserHttpTrigger> Logger, IUserService UserService)
         {
             this.Logger = Logger;
-			this.UserService = userService;
+			this.UserService = UserService;
         }
 
-		[Function(nameof(UserHttpTrigger.GetUserById))]
-		[OpenApiOperation(operationId: "GetUserById", tags: new[] { "user" }, Summary = "Find user by ID", Description = "Returns a user.", Visibility = OpenApiVisibilityType.Important)]
+		[Function(nameof(UserHttpTrigger.FindUserById))]
+		[OpenApiOperation(operationId: "FindUserById", tags: new[] { "user" }, Summary = "Find user by ID", Description = "Returns a user by ID.", Visibility = OpenApiVisibilityType.Important)]
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
-		[OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "ID of user to return", Description = "ID of user to return", Visibility = OpenApiVisibilityType.Important)]
+		[OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(long?), Summary = "ID of user to return", Description = "ID of user to return", Visibility = OpenApiVisibilityType.Important)]
 		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(User), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyUserExample))]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "User not found", Description = "User not found")]
-		public async Task<HttpResponseData> GetUserById(
+		public async Task<HttpResponseData> FindUserById(
 			[HttpTrigger(AuthorizationLevel.Function, "GET", Route = "user/{userId}")]
 			HttpRequestData req,
 			long? userId,
@@ -43,43 +42,42 @@ namespace KiCoKalender.Controllers
 			// Generate output
 			HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-			if (userId.HasValue)
+			if (!userId.HasValue)
 			{
 				response = req.CreateResponse(HttpStatusCode.BadRequest);
 			}
 			else 
 			{
-				await response.WriteAsJsonAsync(UserService.GetUserById(userId));
+				await response.WriteAsJsonAsync(UserService.FindUserById(userId));
 			}
 
 			return response;
 		}
 
-		[Function(nameof(UserHttpTrigger.GetUserByRole))]
-		[OpenApiOperation(operationId: "GetUserByRole", tags: new[] { "user" }, Summary = "Finds Users by Role", Description = "Multiple status values can be provided with comma separated strings.", Visibility = OpenApiVisibilityType.Important)]
+		[Function(nameof(UserHttpTrigger.FindByName))]
+		[OpenApiOperation(operationId: "FindByName", tags: new[] { "user" }, Summary = "Finds User by name", Description = "Returns a user by name.", Visibility = OpenApiVisibilityType.Important)]
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
-		[OpenApiParameter(name: "role", In = ParameterLocation.Query, Required = true, Type = typeof(Role), Summary = "Role value", Description = "Status values that need to be considered for filter", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<Role>), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyUserExample))]
-		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid role value", Description = "Invalid role value")]
-		public async Task<HttpResponseData> GetUserByRole(
-			[HttpTrigger(AuthorizationLevel.Function, "GET",
-			Route = "user/FindByRole")]
+		[OpenApiParameter(name: "userName", In = ParameterLocation.Query, Required = true, Type = typeof(string), Summary = "Name of user to return", Description = "Name of user to return", Visibility = OpenApiVisibilityType.Important)]
+		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(User), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyUserExample))]
+		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid name value", Description = "Invalid name value")]
+		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "User not found", Description = "User not found")]
+		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Validation exception", Description = "Validation exception")]
+		public async Task<HttpResponseData> FindByName(
+			[HttpTrigger(AuthorizationLevel.Function, "GET", Route = "user/FindByName")]
 			HttpRequestData req,
-			Role role,
+			string name,
 			FunctionContext executionContext)
 		{
 			// Generate output
 			HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-			List<User> user = new List<User>() { };
-
-			if (!System.Enum.IsDefined(typeof(Role), role))
+			if (string.IsNullOrEmpty(name))
 			{
 				response = req.CreateResponse(HttpStatusCode.BadRequest);
 			}
 			else
 			{
-				await response.WriteAsJsonAsync(UserService.GetUserByRole(role));
+				await response.WriteAsJsonAsync(UserService.FindUserByName(name));
 			}
 
 			return response;
@@ -90,10 +88,10 @@ namespace KiCoKalender.Controllers
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
 		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(User), Required = true, Description = "User object that needs to be added to the KiCoKalender")]
 		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(User), Summary = "New user added", Description = "New user added", Example = typeof(DummyUserExample))]
-		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Invalid input", Description = "Invalid input")]
+		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid input", Description = "Invalid input")]
+		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Validation exception", Description = "Validation exception")]
 		public async Task<HttpResponseData> AddUser(
-			[HttpTrigger(AuthorizationLevel.Function,
-			"POST", Route = "user")] 
+			[HttpTrigger(AuthorizationLevel.Function, "POST", Route = "user")] 
 			HttpRequestData req,
 			FunctionContext executionContext)
 		{
@@ -113,6 +111,8 @@ namespace KiCoKalender.Controllers
 				UserService.AddUser(user);
 			}
 
+			await response.WriteAsJsonAsync(user);
+
 			return response;
 		}
 
@@ -124,7 +124,10 @@ namespace KiCoKalender.Controllers
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "User not found", Description = "User not found")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Validation exception", Description = "Validation exception")]
-		public async Task<HttpResponseData> UpdateUser([HttpTrigger(AuthorizationLevel.Function, "PUT", Route = "user")] HttpRequestData req, FunctionContext executionContext)
+		public async Task<HttpResponseData> UpdateUser(
+			[HttpTrigger(AuthorizationLevel.Function, "PUT", Route = "user")]
+			HttpRequestData req,
+			FunctionContext executionContext)
 		{
 			// Parse input
 			string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
@@ -133,17 +136,28 @@ namespace KiCoKalender.Controllers
 			// Generate output
 			HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
+			if (user == null)
+			{
+				response = req.CreateResponse(HttpStatusCode.BadRequest);
+			}
+			else
+			{
+				UserService.UpdateUser(user);
+			}
+
 			await response.WriteAsJsonAsync(user);
 
 			return response;
 		}
 
 		[Function(nameof(UserHttpTrigger.DeleteUser))]
-		[OpenApiOperation(operationId: "deleteUser", tags: new[] { "user" }, Summary = "Deletes a user to the KiCoKalender", Description = "This Deletes a user to the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
+		[OpenApiOperation(operationId: "deleteUser", tags: new[] { "user" }, Summary = "Deletes a user from the KiCoKalender", Description = "Deletes a user from the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
-		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(User), Required = true, Description = "User object that needs to be Deleted from the KiCoKalender")]
+		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(long?), Required = true, Description = "User object that needs to be Deleted from the KiCoKalender")]
 		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(User), Summary = "New user Delete", Description = "user deleted")]
-		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Invalid input", Description = "Invalid input")]
+		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid input", Description = "Invalid input")]
+		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "User not found", Description = "User not found")]
+		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Validation exception", Description = "Validation exception")]
 		public async Task<HttpResponseData> DeleteUser(
 			[HttpTrigger(AuthorizationLevel.Function,
 			"DELETE", Route = "user")]
@@ -163,8 +177,10 @@ namespace KiCoKalender.Controllers
 			}
 			else
 			{
-				//UserService.AddAsset(asset);
+				UserService.DeleteUser(user);
 			}
+
+			await response.WriteAsJsonAsync(user);
 
 			return response;
 		}

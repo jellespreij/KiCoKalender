@@ -9,6 +9,10 @@ namespace KiCoKalender.Interfaces
 {
     interface IAssetService
     {
-        Task<Asset> GetAssetById(int assetId);
+        Task<List<Asset>> FindAssetByUserId(long? userId);
+        void AddAsset(Asset asset);
+        void DeleteAsset(Asset asset);
+        void UpdateAsset(Asset asset);
+        Task<List<Asset>> FindByAssetsEnum(long? userId, AssetsEnum assetsEnum);
     }
 }

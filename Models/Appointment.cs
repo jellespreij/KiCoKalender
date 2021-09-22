@@ -9,8 +9,8 @@ using System;
 
 namespace KiCoKalender.Models
 {
-    [OpenApiExample(typeof(DummyUserExample))]
-    public class Appointment : TableEntity
+    [OpenApiExample(typeof(DummyAppointmentExample))]
+    public class Appointment
     {
         [OpenApiProperty(Description = "Gets or sets the appointment ID.")]
         public long? appointmentId { get; set; }
@@ -38,9 +38,17 @@ namespace KiCoKalender.Models
             this.appointmentName = appointmentName;
             this.AppointmentDescription = appointmentDescription;
             this.AppointmentDate = appointmentDate;
+        }
+    }
 
-            //PartitionKey = userId;
-            //RowKey = userLastName + userFirstName;
+    public class DummyAppointmentExample : OpenApiExample<User>
+    {
+        public override IOpenApiExample<User> Build(NamingStrategy NamingStrategy = null)
+        {
+
+            Examples.Add(OpenApiExampleResolver.Resolve("Appointment", "This is an appointment summary", new Appointment() { appointmentId = 1, appointmentName = "name", AppointmentDescription = "description", AppointmentDate = new DateTime(2000, 10, 10) }, NamingStrategy));
+
+            return this;
         }
     }
 }

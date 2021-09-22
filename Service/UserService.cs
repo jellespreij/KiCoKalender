@@ -19,9 +19,9 @@ namespace KiCoKalender.Service
             this.UserRepository = userRepository;
         }
 
-        public async Task<User> GetUserById(long? userId)
+        public async Task<User> FindUserById(long? userId)
         {
-            return await UserRepository.GetUserById(userId);
+            return await UserRepository.FindUserById(userId);
         }
 
         public void AddUser(User user) 
@@ -29,9 +29,19 @@ namespace KiCoKalender.Service
             UserRepository.AddUser(user);
         }
 
-        public async Task<User> GetUserByRole(Role role)
+        public async Task<User> FindUserByName(string name)
         {
-            return await UserRepository.GetUserByRole(role);
+            return await UserRepository.FindUserByName(name);
+        }
+
+        public void UpdateUser(User user)
+        {
+            UserRepository.UpdateUser(user);
+        }
+
+        public void DeleteUser(User user)
+        {
+            UserRepository.DeleteUser(user);
         }
     }
 }

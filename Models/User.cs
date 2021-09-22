@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Resolvers;
@@ -9,33 +10,44 @@ using Newtonsoft.Json.Serialization;
 namespace KiCoKalender.Models
 {
     [OpenApiExample(typeof(DummyUserExample))]
-    public class User : TableEntity
+    public class User
     {
-        [OpenApiProperty(Description = "Gets or sets the parent ID.")]
+        [OpenApiProperty(Description = "Gets or sets the ID.")]
         public long? userId { get; set; }
 
-        [OpenApiProperty(Description = "Gets or sets the first name.")]
+        [OpenApiProperty(Description = "Gets or sets the name.")]
         [JsonRequired]
-        public string userFirstName { get; set; }
+        public string userName { get; set; }
 
-        [OpenApiProperty(Description = "Gets or sets the last name.")]
+        [OpenApiProperty(Description = "Gets or sets the age.")]
         [JsonRequired]
-        public string userLastName { get; set; }
+        public DateTime userAge { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the Role for the user.")]
         [JsonRequired]
         public Role userRole { get; set; }
 
-        public User() 
+        [OpenApiProperty(Description = "Gets or sets the adres.")]
+        [JsonRequired]
+        public string userAddress { get; set; }
+
+        [OpenApiProperty(Description = "Gets or sets the postcode.")]
+        [JsonRequired]
+        public string userPostcode { get; set; }
+
+        [OpenApiProperty(Description = "Gets or sets created date.")]
+        [JsonRequired]
+        public DateTime userCreated { get; set; }
+
+        public User()
         {
-        
+
         }
 
         public User(long? userId, string userFirstName, string userLastName, Role userRole)
         {
             this.userId = userId;
-            this.userFirstName = userFirstName;
-            this.userLastName = userLastName;
+            this.userName = userName;
             this.userRole = userRole;
 
             //PartitionKey = userId;
@@ -47,9 +59,8 @@ namespace KiCoKalender.Models
     {
         public override IOpenApiExample<User> Build(NamingStrategy NamingStrategy = null)
         {
-            Examples.Add(OpenApiExampleResolver.Resolve("Dirk", "This is Dirk's summary",new User() { userId = 33, userFirstName = "Dirk", userLastName = "Dirksma", userRole = Role.Parent}, NamingStrategy));
-            Examples.Add(OpenApiExampleResolver.Resolve("Jan", "This is Jan's summary", new User() { userId = 34, userFirstName = "Jan", userLastName = "Jansma", userRole = Role.Parent }, NamingStrategy));
-    
+            Examples.Add(OpenApiExampleResolver.Resolve("Dirk", "This is Dirk's summary", new User() { userId = 101, userName = "Dirk Dirksma", userRole = Role.Parent, userAge = new DateTime(2000, 10, 10), userAddress = "street", userPostcode = "1234AB", userCreated = DateTime.Now }, NamingStrategy));
+
             return this;
         }
     }
