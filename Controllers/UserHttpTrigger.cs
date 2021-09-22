@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using System.IO;
 using Newtonsoft.Json;
 using KiCoKalender.Interfaces;
+using KiCoKalender.Attributes;
 
 namespace KiCoKalender.Controllers
 {
@@ -27,12 +28,15 @@ namespace KiCoKalender.Controllers
         }
 
 		[Function(nameof(UserHttpTrigger.FindUserById))]
+		[UserAuth]
 		[OpenApiOperation(operationId: "FindUserById", tags: new[] { "user" }, Summary = "Find user by ID", Description = "Returns a user by ID.", Visibility = OpenApiVisibilityType.Important)]
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
 		[OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(long?), Summary = "ID of user to return", Description = "ID of user to return", Visibility = OpenApiVisibilityType.Important)]
 		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(User), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyUserExample))]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "User not found", Description = "User not found")]
+		[UnauthorizedResponse]
+		[ForbiddenResponse]
 		public async Task<HttpResponseData> FindUserById(
 			[HttpTrigger(AuthorizationLevel.Function, "GET", Route = "user/{userId}")]
 			HttpRequestData req,

@@ -1,6 +1,7 @@
 using KiCoKalender.Interfaces;
 using KiCoKalender.Repository;
 using KiCoKalender.Service;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Extensions.OpenApi;
 using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Extensions;
 using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Functions;
@@ -14,7 +15,10 @@ namespace KiCoKalender.Startup {
 	public class Program {
 		public static void Main() {
 			IHost host = new HostBuilder()
-				.ConfigureFunctionsWorkerDefaults(worker => worker.UseNewtonsoftJson())
+				.ConfigureFunctionsWorkerDefaults((IFunctionsWorkerApplicationBuilder Builder) => {
+					Builder.UseNewtonsoftJson().UseMiddleware<JwtMiddleware>();
+				})
+				.ConfigureOpenApi()
 				.ConfigureServices(Configure)
 				.Build();
 
@@ -31,6 +35,7 @@ namespace KiCoKalender.Startup {
 			Services.AddSingleton<AssetRepository>();
 			Services.AddSingleton<IAppointmentService, AppointmentService>();
 			Services.AddSingleton<AppointmentRepository>();
+			Services.AddSingleton<ITokenService, TokenService>();
 		}
 	}
 }
