@@ -8,8 +8,8 @@ namespace KiCoKalender.Models
 {
 	[OpenApiExample(typeof(LoginRequestExample))]
 	public class LoginRequest
-	{
-		[OpenApiProperty(Description = "Username for the user logging in.")]
+    {
+        [OpenApiProperty(Description = "Username for the user logging in.")]
 		[JsonRequired]
 		public string Username { get; set; }
 

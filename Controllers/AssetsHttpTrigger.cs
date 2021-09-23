@@ -26,16 +26,16 @@ namespace KiCoKalender.Controllers
 			this.AssetService = AssetService;
 		}
 
-		[Function(nameof(AssetsHttpTrigger.FindByUserID))]
-		[OpenApiOperation(operationId: "FindByUserID", tags: new[] { "asset" }, Summary = "Find asset by userId", Description = "Returns assets by userId.", Visibility = OpenApiVisibilityType.Important)]
+		[Function(nameof(AssetsHttpTrigger.FindAssetsByUserID))]
+		[OpenApiOperation(operationId: "FindAssetsByUserID", tags: new[] { "asset" }, Summary = "Find asset by userId", Description = "Returns assets by userId.", Visibility = OpenApiVisibilityType.Important)]
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
 		[OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(long?), Summary = "userId of Assets to return", Description = "userId of Assets to return", Visibility = OpenApiVisibilityType.Important)]
 		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyAssetExample))]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Assets not found", Description = "Assets not found")]
-		public async Task<HttpResponseData> FindByUserID(
+		public async Task<HttpResponseData> FindAssetsByUserID(
 			[HttpTrigger(AuthorizationLevel.Function,
-			"GET", Route = "asset/{userId}")]
+			"GET", Route = "asset/{user-id}")]
 			HttpRequestData req,
 			long? userId,
 			FunctionContext executionContext)
@@ -161,7 +161,7 @@ namespace KiCoKalender.Controllers
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Asset not found", Description = "Asset not found")]
 		public async Task<HttpResponseData> FindByAssetEnum(
 			[HttpTrigger(AuthorizationLevel.Function,
-			"GET", Route = "asset/{userId}/findByAssetEnum")]
+			"GET", Route = "asset/{user-id}/findByAssetEnum")]
 			HttpRequestData req,
 			long? userId,
 			AssetsEnum assetsEnum,

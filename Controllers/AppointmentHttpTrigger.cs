@@ -27,16 +27,16 @@ namespace KiCoKalender.Controllers
             this.AppointmentService = AppointmentService;
         }
 
-		[Function(nameof(AppointmentHttpTrigger.FindByUserId2))]
-		[OpenApiOperation(operationId: "FindByUserId2", tags: new[] { "appointment" }, Summary = "Find appointment by userId", Description = "Returns an appointment.", Visibility = OpenApiVisibilityType.Important)]
+		[Function(nameof(AppointmentHttpTrigger.FindAppointmentByUserId))]
+		[OpenApiOperation(operationId: "FindAppointmentByUserId", tags: new[] { "appointment" }, Summary = "Find appointments by userId", Description = "Returns an appointment.", Visibility = OpenApiVisibilityType.Important)]
 		//[OpenApiSecurity("petstore_auth", SecuritySchemeType.Http, In = OpenApiSecurityLocationType.Header, Scheme = OpenApiSecuritySchemeType.Bearer, BearerFormat = "JWT")]
 		[OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(long?), Summary = "userId for appointments to return", Description = "userId for appointments to return", Visibility = OpenApiVisibilityType.Important)]
 		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Appointment), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyAppointmentExample))]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "User not found", Description = "User not found")]
-		public async Task<HttpResponseData> FindByUserId2(
+		public async Task<HttpResponseData> FindAppointmentByUserId(
 			[HttpTrigger(AuthorizationLevel.Function,
-			"GET", Route = "appointment/{userId}")]
+			"GET", Route = "appointment/{user-id}")]
 			HttpRequestData req,
 			long? userId,
 			FunctionContext executionContext)

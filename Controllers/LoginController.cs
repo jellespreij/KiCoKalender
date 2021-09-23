@@ -44,5 +44,30 @@ namespace KiCoKalender.Controllers
 
             return response;
         }
+
+        [Function(nameof(LoginController.ResetPassword))]
+        [OpenApiOperation(operationId: "ResetPassword", tags: new[] { "Login" }, Summary = "Reset password for a user",
+                           Description = "This method sends user a reset password email.")]
+        [OpenApiParameter(name: "email", In = ParameterLocation.Query, Required = true, Type = typeof(string), Summary = "Email of user for reset password", Description = "Email of user", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(string), Required = true, Description = "The user email")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(string), Description = "Reset password email send")]
+        public async Task<HttpResponseData> ResetPassword([HttpTrigger(AuthorizationLevel.Anonymous, "post")]
+        HttpRequestData req,
+        string email,
+        FunctionContext executionContext)
+        {
+            HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
+
+            if (string.IsNullOrEmpty(email))
+            {
+                response = req.CreateResponse(HttpStatusCode.BadRequest);
+            }
+            else
+            {
+                Logger.LogInformation("reset pass email send");
+            }
+
+            return response;
+        }
     }
 }

@@ -38,7 +38,7 @@ namespace KiCoKalender.Controllers
 		[UnauthorizedResponse]
 		[ForbiddenResponse]
 		public async Task<HttpResponseData> FindUserById(
-			[HttpTrigger(AuthorizationLevel.Function, "GET", Route = "user/{userId}")]
+			[HttpTrigger(AuthorizationLevel.Function, "GET", Route = "user/{user-id}")]
 			HttpRequestData req,
 			long? userId,
 			FunctionContext executionContext)
