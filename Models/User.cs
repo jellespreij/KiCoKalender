@@ -1,57 +1,73 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
+﻿using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Resolvers;
-using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System;
 
-namespace KiCoKalender.Models
+namespace Models
 {
     [OpenApiExample(typeof(DummyUserExample))]
-    public class User
+    public class User : IEntityBase
     {
         [OpenApiProperty(Description = "Gets or sets the ID.")]
-        public long? userId { get; set; }
+        [JsonRequired]
+        public long Id { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the name.")]
         [JsonRequired]
-        public string userName { get; set; }
+        public string Name { get; set; }
+
+        [OpenApiProperty(Description = "Gets or sets the email.")]
+        [JsonRequired]
+        public string Email { get; set; }
+
+        [OpenApiProperty(Description = "Gets or sets the password.")]
+        [JsonRequired]
+        public string Password { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the age.")]
         [JsonRequired]
-        public DateTime userAge { get; set; }
+        public DateTime Age { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the Role for the user.")]
         [JsonRequired]
-        public Role userRole { get; set; }
+        public Role Role { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the adres.")]
         [JsonRequired]
-        public string userAddress { get; set; }
+        public string Address { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the postcode.")]
         [JsonRequired]
-        public string userPostcode { get; set; }
+        public string Postcode { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets created date.")]
         [JsonRequired]
-        public DateTime userCreated { get; set; }
+        public DateTime Created { get; set; }
+
+        [OpenApiProperty(Description = "Gets or sets the partitionKey.")]
+        [JsonRequired]
+        public string PartitionKey { get; set; }
 
         public User()
         {
 
         }
 
-        public User(long? userId, string userFirstName, string userLastName, Role userRole)
+        public User(long id, string name, string email, string password, Role role, DateTime age, string address, string postcode, string partitionKey)
         {
-            this.userId = userId;
-            this.userName = userName;
-            this.userRole = userRole;
-
-            //PartitionKey = userId;
-            //RowKey = userLastName + userFirstName;
+            Id = id;
+            Name = name;
+            Email = email;
+            Password = password;
+            Role = role;
+            Age = age;
+            Address = address;
+            Postcode = postcode;
+            Created = DateTime.Now;
+            PartitionKey = partitionKey;
         }
     }
 
@@ -59,7 +75,7 @@ namespace KiCoKalender.Models
     {
         public override IOpenApiExample<User> Build(NamingStrategy NamingStrategy = null)
         {
-            Examples.Add(OpenApiExampleResolver.Resolve("Dirk", "This is Dirk's summary", new User() { userId = 101, userName = "Dirk Dirksma", userRole = Role.Parent, userAge = new DateTime(2000, 10, 10), userAddress = "street", userPostcode = "1234AB", userCreated = DateTime.Now }, NamingStrategy));
+            Examples.Add(OpenApiExampleResolver.Resolve("User", "This is a user summary", new User() { Id = 1, Name = "Dirk Dirksma", Role = Role.Parent, Email = "-email-", Password = "DitIsEenWachtwoord", Age = new DateTime(2000, 10, 10), Address = "street", Postcode = "1234AB", Created = DateTime.Now, PartitionKey = "1" }, NamingStrategy));
 
             return this;
         }
