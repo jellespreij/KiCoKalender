@@ -11,10 +11,11 @@ namespace Context
 {
     public class CosmosDBContext : DbContext
     {
-        public DbSet<User> Users { get; set; }
+        public DbSet<UserContext> UserContexts { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Asset> Assets { get; set; }
         public DbSet<Family> Families { get; set; }
+        public DbSet<Address> Addresses { get; set; }
 
 
         //DONT FORGET TO NUGET INSTALL: Install-Package Microsoft.EntityFrameworkCore.Cosmos -Version 5.0.10 for DbContextbuilder Use Cosmos
@@ -26,23 +27,18 @@ namespace Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var converter = new ValueConverter<List<long>, string>(
-                v => string.Join(";", v),
-                v => v.Split(";", StringSplitOptions.RemoveEmptyEntries).Select(val => long.Parse(val)).ToList());
-
-
             modelBuilder.HasDefaultContainer("Containers");
 
-            modelBuilder.Entity<User>()
-                .ToContainer("users");
+            modelBuilder.Entity<UserContext>()
+                .ToContainer("userContexts");
 
-            modelBuilder.Entity<User>()
+            modelBuilder.Entity<UserContext>()
                 .HasNoDiscriminator();
 
-            modelBuilder.Entity<User>()
-                .HasPartitionKey(o => o.PartitionKey);
+            modelBuilder.Entity<UserContext>()
+                .HasPartitionKey(u => u.PartitionKey);
 
-            modelBuilder.Entity<User>()
+            modelBuilder.Entity<UserContext>()
                 .UseETagConcurrency();
 
             modelBuilder.Entity<Appointment>()
@@ -52,7 +48,7 @@ namespace Context
                 .HasNoDiscriminator();
 
             modelBuilder.Entity<Appointment>()
-                .HasPartitionKey(o => o.PartitionKey);
+                .HasPartitionKey(ap => ap.PartitionKey);
 
             modelBuilder.Entity<Appointment>()
                 .UseETagConcurrency();
@@ -64,7 +60,7 @@ namespace Context
                 .HasNoDiscriminator();
 
             modelBuilder.Entity<Asset>()
-                .HasPartitionKey(o => o.PartitionKey);
+                .HasPartitionKey(a => a.PartitionKey);
 
             modelBuilder.Entity<Asset>()
                 .UseETagConcurrency();
@@ -76,9 +72,21 @@ namespace Context
                 .HasNoDiscriminator();
 
             modelBuilder.Entity<Family>()
-                .HasPartitionKey(o => o.PartitionKey);
+                .HasPartitionKey(f => f.PartitionKey);
 
             modelBuilder.Entity<Family>()
+                .UseETagConcurrency();
+
+            modelBuilder.Entity<Address>()
+                .ToContainer("addresses");
+
+            modelBuilder.Entity<Address>()
+                .HasNoDiscriminator();
+
+            modelBuilder.Entity<Address>()
+                .HasPartitionKey(ad => ad.PartitionKey);
+
+            modelBuilder.Entity<Address>()
                 .UseETagConcurrency();
         }
     }

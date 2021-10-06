@@ -88,14 +88,14 @@ namespace Controllers
 
 		[Function("FindAssetsByFamilyIdAndFolder")]
 		[OpenApiOperation(operationId: "FindAssetsByFamilyIdAndFolder", tags: new[] { "asset" }, Summary = "Find assets by familyId and folder", Description = "Returns assets by familyId and folder.", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiParameter(name: "familyId", In = ParameterLocation.Path, Required = true, Type = typeof(long), Summary = "familyId of Assets to return", Description = "familyId of Assets to return", Visibility = OpenApiVisibilityType.Important)]
+		[OpenApiParameter(name: "familyId", In = ParameterLocation.Query, Required = true, Type = typeof(long), Summary = "familyId of Assets to return", Description = "familyId of Assets to return", Visibility = OpenApiVisibilityType.Important)]
 		[OpenApiParameter(name: "folder", In = ParameterLocation.Query, Required = true, Type = typeof(List<Folder>), Summary = "folder of Assets to return", Description = "folder of Assets to return", Visibility = OpenApiVisibilityType.Important)]
 		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(IEnumerable<Asset>), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyAssetExample))]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Assets not found", Description = "Assets not found")]
 		public async Task<HttpResponseData> FindAssetsByFamilyIdAndFolder(
 			[HttpTrigger(AuthorizationLevel.Function,
-			"GET", Route = "asset/{familyId}")]
+			"GET", Route = "asset")]
 			HttpRequestData req,
 			long familyId,
 			string folder,
@@ -119,7 +119,7 @@ namespace Controllers
 		[Function("DeleteAsset")]
 		[OpenApiOperation(operationId: "DeleteAsset", tags: new[] { "asset" }, Summary = "Deletes an asset from the KiCoKalender", Description = "This Deletes an asset from the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
 		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be Deleted from the KiCoKalender", Example = typeof(DummyAssetExample))]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(User), Summary = "Asset Deleted", Description = "Asset deleted")]
+		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(UserContext), Summary = "Asset Deleted", Description = "Asset deleted")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid input", Description = "Invalid input")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Asset not found", Description = "Asset not found")]
 		public async Task<HttpResponseData> DeleteAsset(

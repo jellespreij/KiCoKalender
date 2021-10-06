@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Repositories
 {
-    public class UserRepository : BaseRepository<User>, IUserRepository
+    public class UserContextRepository : BaseRepository<UserContext>, IUserContextRepository
     {
-        public UserRepository(CosmosDBContext cosmosDBContext) : base(cosmosDBContext) 
+        public UserContextRepository(CosmosDBContext cosmosDBContext) : base(cosmosDBContext) 
         {
             
         }
