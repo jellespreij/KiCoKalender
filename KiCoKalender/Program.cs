@@ -1,3 +1,5 @@
+using Auth;
+using Auth.Interfaces;
 using Context;
 using Controllers;
 using Microsoft.Azure.Functions.Worker;
@@ -17,6 +19,7 @@ namespace KiCoKalender
 		{
 			IHost host = new HostBuilder()
 				.ConfigureFunctionsWorkerDefaults((IFunctionsWorkerApplicationBuilder Builder) => {
+					Builder.UseNewtonsoftJson().UseMiddleware<JwtMiddleware>();
 				})
 				.ConfigureOpenApi()
 				.ConfigureServices(Configure)
@@ -49,6 +52,12 @@ namespace KiCoKalender
 			Services.AddSingleton<AddressController>();
 			Services.AddSingleton<IAddressService, AddressService>();
 			Services.AddTransient<IAddressRepository, AddressRepository>();
+
+			Services.AddSingleton<AuthController>();
+			Services.AddSingleton<ITokenService, TokenService>();
+			Services.AddSingleton<IAuthService, AuthService>();
+			Services.AddSingleton<IAuthenticate, Authenticate>();
+			Services.AddTransient<IAuthRepository, AuthRepository>();
 
 			Services.AddTransient<CosmosDBContext>();
 		}
