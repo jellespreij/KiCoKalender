@@ -30,9 +30,9 @@ namespace KiCoKalender
 			Services.AddSingleton<IOpenApiHttpTriggerContext, OpenApiHttpTriggerContext>();
 			Services.AddSingleton<IOpenApiTriggerFunction, OpenApiTriggerFunction>();
 
-			Services.AddSingleton<UserController>();
-			Services.AddSingleton<IUserService, UserService>();
-			Services.AddTransient<IUserRepository, UserRepository>();
+			Services.AddSingleton<UserContextController>();
+			Services.AddSingleton<IUserContextService, UserContextService>();
+			Services.AddTransient<IUserContextRepository, UserContextRepository>();
 
 			Services.AddSingleton<AppointmentController>();
 			Services.AddSingleton<IAppointmentService, AppointmentService>();
@@ -45,6 +45,10 @@ namespace KiCoKalender
 			Services.AddSingleton<FamilyController>();
 			Services.AddSingleton<IFamilyService, FamilyService>();
 			Services.AddTransient<IFamilyRepository, FamilyRepository>();
+
+			Services.AddSingleton<AddressController>();
+			Services.AddSingleton<IAddressService, AddressService>();
+			Services.AddTransient<IAddressRepository, AddressRepository>();
 
 			Services.AddTransient<CosmosDBContext>();
 		}
