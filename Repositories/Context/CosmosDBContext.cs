@@ -16,6 +16,7 @@ namespace Context
         public DbSet<Asset> Assets { get; set; }
         public DbSet<Family> Families { get; set; }
         public DbSet<Address> Addresses { get; set; }
+        public DbSet<User> Users { get; set; }
 
 
         //DONT FORGET TO NUGET INSTALL: Install-Package Microsoft.EntityFrameworkCore.Cosmos -Version 5.0.10 for DbContextbuilder Use Cosmos
@@ -87,6 +88,18 @@ namespace Context
                 .HasPartitionKey(ad => ad.PartitionKey);
 
             modelBuilder.Entity<Address>()
+                .UseETagConcurrency();
+
+            modelBuilder.Entity<User>()
+                .ToContainer("users");
+
+            modelBuilder.Entity<User>()
+                .HasNoDiscriminator();
+
+            modelBuilder.Entity<User>()
+                .HasPartitionKey(us => us.PartitionKey);
+
+            modelBuilder.Entity<User>()
                 .UseETagConcurrency();
         }
     }
