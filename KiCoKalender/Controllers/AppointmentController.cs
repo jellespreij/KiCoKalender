@@ -81,13 +81,13 @@ namespace Controllers
 
 		[Function("FindAppointmentByFamilyId")]
 		[OpenApiOperation(operationId: "FindAppointmentByFamilyId", tags: new[] { "appointment" }, Summary = "Find appointments by familyId", Description = "Returns appointments.", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiParameter(name: "familyId", In = ParameterLocation.Path, Required = true, Type = typeof(long), Summary = "familyId for appointments to return", Description = "familyId for appointments to return", Visibility = OpenApiVisibilityType.Important)]
+		[OpenApiParameter(name: "familyId", In = ParameterLocation.Query, Required = true, Type = typeof(long), Summary = "familyId for appointments to return", Description = "familyId for appointments to return", Visibility = OpenApiVisibilityType.Important)]
 		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(IEnumerable<Appointment>), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyAppointmentExample))]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "User not found", Description = "User not found")]
 		public async Task<HttpResponseData> FindAppointmentByFamilyId(
 			[HttpTrigger(AuthorizationLevel.Function,
-			"GET", Route = "appointment/{familyId}")]
+			"GET", Route = "appointment")]
 			HttpRequestData req,
 			long familyId,
 			FunctionContext executionContext)
