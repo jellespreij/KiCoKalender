@@ -13,5 +13,6 @@ namespace Services
         void AddFamily(Family family);
         void UpdateFamily(Family family);
         void DeleteFamily(Family family);
+        void SendMail(string toEmail);
     }
 }

@@ -1,10 +1,7 @@
 ﻿using Models;
 using Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace Services
 {
@@ -18,7 +15,13 @@ namespace Services
         }
         public void RegistrateUser(User user)
         {
-            _authRepository.Add(user);
+            User userObject = _authRepository.FindUser(e => e.Username == user.Username);
+            if (userObject is null )
+            {
+                user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                _authRepository.Add(user);
+            }
+
         }
     }
 }

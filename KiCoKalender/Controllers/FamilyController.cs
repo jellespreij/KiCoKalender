@@ -98,6 +98,23 @@ namespace Controllers
 
 			return response;
 			});
-			}
+		}
+
+		[Function("SendMail")]
+		[UserAuth]
+		[OpenApiOperation(operationId: "SendMail", tags: new[] { "family" }, Summary = "Send email to other user to invite them to the KiCoKalender",
+			Description = "This method sends a mail to invite a other user")]
+		[OpenApiParameter(name: "email", In = ParameterLocation.Query, Required = true, Type = typeof(string), Summary = "Email to send the email to", Description = "Email to send to", Visibility = OpenApiVisibilityType.Important)]
+		[UnauthorizedResponse]
+		[ForbiddenResponse]
+		public async Task<HttpResponseData> SendMail([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req, string email, FunctionContext executionContext)
+		{
+			return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) => {
+				HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
+				FamilyService.SendMail(email);
+
+				return response;
+			});
+		}
 	}
 }
