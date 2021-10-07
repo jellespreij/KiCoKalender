@@ -16,6 +16,10 @@ using Microsoft.AspNetCore.Http;
 using Auth.Interfaces;
 using System.Security.Claims;
 using Attributes;
+using Microsoft.Azure.Storage;
+using ConsoleAppBlobStorage.Infrastructure;
+using Microsoft.Azure.Storage.Blob;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Controllers
 {
@@ -34,7 +38,10 @@ namespace Controllers
 		[Function("AddAsset")]
 		[UserAuth]
 		[OpenApiOperation(operationId: "AddAsset", tags: new[] { "asset" }, Summary = "Add an asset to the KiCoKalender", Description = "This adds an asset to the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be added to the KiCoKalender", Example = typeof(DummyAssetExample))]
+		[OpenApiRequestBody(contentType: "application/octet-stream", bodyType: typeof(string), Required = true, Description = "Asset object that needs to be added to the KiCoKalender")]
+		[OpenApiRequestBody(contentType: "multipart/form-data", bodyType: typeof(IFormFile), Required = true, Description = "Asset object that needs to be added to the KiCoKalender")]
+		//[OpenApiParameter(name: "File", In = ParameterLocation.formData, Required = true, Type = typeof(File), Summary = "userId of Assets to return", Description = "userId of Assets to return", Visibility = OpenApiVisibilityType.Important)]
+		//[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be added to the KiCoKalender", Example = typeof(DummyAssetExample))]
 		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "New asset added", Description = "New asset added")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Invalid input", Description = "Invalid input")]
 		[UnauthorizedResponse]
@@ -46,13 +53,11 @@ namespace Controllers
 			FunctionContext executionContext)
 		{
 			return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) => {
-			// Parse input
-			string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-			Asset asset = JsonConvert.DeserializeObject<Asset>(requestBody);
-
-			// Generate output
-			HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
-
+				string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+				Asset asset = JsonConvert.DeserializeObject<Asset>(requestBody);
+				// Generate output
+				HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
+			
 			if (asset is null)
 			{
 				response = req.CreateResponse(HttpStatusCode.BadRequest);
@@ -61,8 +66,8 @@ namespace Controllers
 			{
 				AssetService.AddAsset(asset);
 			}
-
-			return response;
+			
+				return response;
 			});
 		}
 

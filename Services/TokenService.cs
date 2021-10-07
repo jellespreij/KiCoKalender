@@ -9,8 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Models;
 using Microsoft.Extensions.Logging;
 using Repositories;
-using System.Collections.Generic;
-using System.Linq;
+using BCryptNet = BCrypt.Net.BCrypt;
 
 namespace Services
 {
@@ -62,9 +61,8 @@ namespace Services
 
         public async Task<LoginResult> CreateToken(User user)
         {
-            User userObject = _authRepository.FindUser(e => e.Username == user.Username && e.Password == user.Password);
-
-            if (userObject is null)
+            User userObject = _authRepository.FindUser(e => e.Username == user.Username);
+            if (userObject is null || !BCryptNet.Verify(user.Password, userObject.Password))
             {
                 throw new Exception("Invalid username or password");
             }
