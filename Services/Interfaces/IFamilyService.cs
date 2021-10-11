@@ -9,7 +9,7 @@ namespace Services
 {
     public interface IFamilyService
     {
-        IEnumerable<Family> FindFamilyByUserIdAndRole(long userId, Role role);
+        IEnumerable<Family> FindFamilyByUserIdAndRole(Guid userId, Role role);
         void AddFamily(Family family);
         void UpdateFamily(Family family);
         void DeleteFamily(Family family);

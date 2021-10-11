@@ -5,6 +5,8 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models
 {
@@ -12,8 +14,9 @@ namespace Models
     public class UserContext : IEntityBase
     {
         [OpenApiProperty(Description = "Gets or sets the ID.")]
-        [JsonRequired]
-        public long Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the userId.")]
         [JsonRequired]
@@ -48,17 +51,23 @@ namespace Models
         public DateTime Created { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the partitionKey.")]
-        [JsonRequired]
-        public string PartitionKey { get; set; }
+        public string PartitionKey
+        {
+            get => Id.ToString();
+            set => Id = Guid.Parse(value);
+        }
+
+
+
 
         public UserContext()
         {
 
         }
 
-        public UserContext(long id, long userId, string name, string email, Role role, DateTime age, string address, string postcode, string partitionKey)
+        /*
+        public UserContext(long userId, string name, string email, Role role, DateTime age, string address, string postcode)
         {
-            Id = id;
             UserId = userId;
             Name = name;
             Email = email;
@@ -67,16 +76,25 @@ namespace Models
             Address = address;
             Postcode = postcode;
             Created = DateTime.Now;
-            PartitionKey = partitionKey;
-        }
+        }*/
     }
 
     public class DummyUserContextExample : OpenApiExample<UserContext>
     {
         public override IOpenApiExample<UserContext> Build(NamingStrategy NamingStrategy = null)
         {
-            Examples.Add(OpenApiExampleResolver.Resolve("User", "This is a user summary", new UserContext() { Id = 1, UserId = 1, Name = "Dirk Dirksma", Role = Role.Parent, Email = "-email-", Age = new DateTime(2000, 10, 10), Address = "street", Postcode = "1234AB", Created = DateTime.Now, PartitionKey = "1" }, NamingStrategy));
-
+            Examples.Add(OpenApiExampleResolver.Resolve("Kim",
+                                            new UserContext()
+                                            {
+                                                Name = "Kim",
+                                                Role = Role.Parent,
+                                                Email = "-email-",
+                                                Age = new DateTime(2000, 10, 10),
+                                                Address = "street",
+                                                Postcode = "1234AB",
+                                                Created = DateTime.Now
+                                            },
+                                            NamingStrategy));
             return this;
         }
     }

@@ -8,8 +8,8 @@ namespace Models
 {
     public interface IEntityBase
     {
-        public long Id { get; set; }
+        public Guid Id { get; set; }
 
-        public string PartitionKey { get; set; }
+        //public string PartitionKey { get; set; }
     }
 }

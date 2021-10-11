@@ -9,10 +9,19 @@ using System.Threading.Tasks;
 
 namespace Models
 {
+	[JsonConverter(typeof(StringEnumConverter))]
 	public enum Role
 	{
+
+		[EnumMember(Value = "Parent")]
 		Parent = 1,
+
+
+		[EnumMember(Value = "Child")]
 		Child = 2,
+
+
+		[EnumMember(Value = "Mediator")]
 		Mediator = 3
 	}
 }

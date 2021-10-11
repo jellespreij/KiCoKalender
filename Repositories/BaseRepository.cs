@@ -20,7 +20,7 @@ namespace Repositories
             _context = context;
         }
 
-        public T GetSingle(long id)
+        public T GetSingle(Guid id)
         {
             return _context.Set<T>().Where(entity => entity.Id == id).FirstOrDefault();
         }

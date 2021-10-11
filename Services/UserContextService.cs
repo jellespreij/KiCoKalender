@@ -27,7 +27,7 @@ namespace Services
             _userContextRepository.Delete(userContext);
         }
 
-        public UserContext FindUserContextByUserId(long userId)
+        public UserContext FindUserContextByUserId(Guid userId)
         {
             return _userContextRepository.GetSingle(userId);
         }
