@@ -14,6 +14,7 @@ using Attributes;
 using System.Security.Claims;
 using Auth;
 using Auth.Interfaces;
+using System;
 
 namespace Controllers
 {
@@ -33,7 +34,7 @@ namespace Controllers
 		[Function("FindUserContextByUserId")]
 		[UserAuth]
 		[OpenApiOperation(operationId: "FindUserContextByUserId", tags: new[] { "user-context" }, Summary = "Find user-context by ID", Description = "Returns the user-context by ID.", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(long), Summary = "UserId of user-context to return", Description = "UserId of user-context to return", Visibility = OpenApiVisibilityType.Important)]
+		[OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(Guid), Summary = "UserId of user-context to return", Description = "UserId of user-context to return", Visibility = OpenApiVisibilityType.Important)]
 		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(UserContext), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyUserContextExample))]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid Id supplied", Description = "Invalid Id supplied")]
 		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "User not found", Description = "User not found")]
@@ -42,14 +43,14 @@ namespace Controllers
 		public async Task<HttpResponseData> FindUserContextByUserId(
 			[HttpTrigger(AuthorizationLevel.Function, "GET", Route = "user-context/{userId}")]
 			HttpRequestData req,
-			long userId,
+			String userId,
 			FunctionContext executionContext)
 		{
 			return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) => {
 				// Generate output
 				HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-				await response.WriteAsJsonAsync(UserService.FindUserContextByUserId(userId));
+				await response.WriteAsJsonAsync(UserService.FindUserContextByUserId(Guid.Parse(userId)));
 
 				return response;
 			});

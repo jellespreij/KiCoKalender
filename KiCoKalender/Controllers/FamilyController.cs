@@ -79,7 +79,7 @@ namespace Controllers
 		public async Task<HttpResponseData> FindFamilyByUserIdAndRole(
 			[HttpTrigger(AuthorizationLevel.Function, "GET", Route = "family/{userId}")]
 			HttpRequestData req,
-			long userId,
+			Guid userId,
 			string role,
 			FunctionContext executionContext)
 		{

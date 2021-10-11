@@ -9,7 +9,7 @@ namespace Services
 {
     public interface IUserContextService
     {
-        UserContext FindUserContextByUserId(long userId);
+        UserContext FindUserContextByUserId(Guid userId);
         void AddUserContext(UserContext userContext);
         UserContext FindUserByName(string name);
         void UpdateUserContext(UserContext userContext);

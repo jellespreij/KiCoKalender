@@ -1,20 +1,26 @@
-﻿using Newtonsoft.Json.Converters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Runtime.Serialization;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Models
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum Folder
     {
+		[EnumMember(Value = "Picture")]
         Picture = 1,
+
+		[EnumMember(Value = "Medical")]
         Medical = 2,
+
+		[EnumMember(Value = "Finance")]
         Finance = 3,
+
+        [EnumMember(Value = "School")]
         School = 4,
+
+        [EnumMember(Value = "Other")]
         Other = 5
     }
 }

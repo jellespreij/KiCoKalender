@@ -1,4 +1,6 @@
-﻿using Models;
+﻿using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
+using Models;
 using Repositories;
 using System;
 using System.Collections.Generic;
@@ -12,14 +14,51 @@ namespace Services
     {
         private IAssetRepository _assetRepository;
 
+        private const string CONTAINERPREFIX = "powerpuffgirls";
+
         public AssetService(IAssetRepository assetRepository)
         {
             _assetRepository = assetRepository;
         }
 
-        public void AddAsset(Asset asset)
+        public async void AddAsset(Asset asset)
         {
-            _assetRepository.Add(asset);
+           // _assetRepository.Add(asset);
+
+            CloudStorageAccount storageAccount = StorageAccountSettings.CreateStorageAccountFromConnectionString();
+
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+
+            CloudBlobContainer container = blobClient.GetContainerReference(CONTAINERPREFIX);
+            try
+            {
+                // Retry policy - optional
+                BlobRequestOptions optionsWithRetryPolicy = new BlobRequestOptions() { RetryPolicy = new Microsoft.Azure.Storage.RetryPolicies.LinearRetry(TimeSpan.FromSeconds(20), 4) };
+
+                await container.CreateIfNotExistsAsync(optionsWithRetryPolicy, null);
+            }
+            catch (StorageException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            // await container.SetPermissionsAsync(new BlobContainerPermissions { PublicAccess = BlobContainerPublicAccessType.Blob });
+
+            // Upload a BlockBlob(.png) to the newly created container
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(asset.Url);
+
+            // Browser now knows it as an image.
+            blockBlob.Properties.ContentType = "image/jpg";
+
+            try
+            {
+                await blockBlob.UploadFromFileAsync(asset.Url);
+            }
+            catch (StorageException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
         }
 
         public void DeleteAsset(Asset asset)

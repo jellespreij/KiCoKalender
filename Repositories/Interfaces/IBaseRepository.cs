@@ -10,7 +10,7 @@ namespace Repositories
 {
     public interface IBaseRepository<T> where T : class, IEntityBase, new()
     {
-        T GetSingle(long id);
+        T GetSingle(Guid id);
         IEnumerable<T> FindBy(Expression<Func<T, bool>> predicate);
         void Add(T item);
         void Update(T item);

@@ -5,6 +5,8 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models
 {
@@ -12,13 +14,15 @@ namespace Models
     public class Appointment : IEntityBase
     {
         [OpenApiProperty(Description = "Gets or sets the appointment ID.")]
-        public long Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the user ID of the creator of the appointment.")]
-        public long UserId { get; set; }
+        public Guid UserId { get; set; }
         
         [OpenApiProperty(Description = "Gets or sets the family ID.")]
-        public long FamilyId { get; set; }
+        public Guid FamilyId { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the appointment name.")]
         [JsonRequired]
@@ -41,15 +45,18 @@ namespace Models
         public bool Accepted { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the partitionKey.")]
-        [JsonRequired]
-        public string PartitionKey { get; set; }
+        public string PartitionKey
+        {
+            get => Id.ToString();
+            set => Id = Guid.Parse(value);
+        }
 
         public Appointment()
         {
 
         }
 
-        public Appointment(long appointmentId, long userId, long familyId, string name, string description, DateTime date, string partitionKey)
+        public Appointment(Guid appointmentId, Guid userId, Guid familyId, string name, string description, DateTime date, string partitionKey)
         {
             Id = appointmentId;
             UserId = userId;
@@ -65,9 +72,19 @@ namespace Models
     {
         public override IOpenApiExample<Appointment> Build(NamingStrategy NamingStrategy = null)
         {
-
-            Examples.Add(OpenApiExampleResolver.Resolve("Appointment", "This is an appointment summary", new Appointment() { Id = 1, UserId = 2, FamilyId = 1, Name = "name", Description = "description", Date = new DateTime(2000, 10, 10), Private = false, Accepted = true, PartitionKey = "2" }, NamingStrategy));
-
+            Guid guid = Guid.NewGuid();
+            Examples.Add(OpenApiExampleResolver.Resolve("Appointment",
+                    new Appointment()
+                    {
+                        UserId = guid,
+                        FamilyId = guid,
+                        Name = "name",
+                        Description = "description",
+                        Date = new DateTime(2000, 10, 10),
+                        Private = false,
+                        Accepted = true
+                    },
+                    NamingStrategy));
             return this;
         }
     }

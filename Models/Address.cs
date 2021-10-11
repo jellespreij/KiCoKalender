@@ -5,6 +5,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,8 +17,9 @@ namespace Models
     public class Address : IEntityBase
     {
         [OpenApiProperty(Description = "Gets or sets the ID.")]
-        [JsonRequired]
-        public long Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the userId.")]
         [JsonRequired]
@@ -42,16 +45,20 @@ namespace Models
         [JsonRequired]
         public DateTime Created { get; set; }
 
+
         [OpenApiProperty(Description = "Gets or sets the partitionKey.")]
-        [JsonRequired]
-        public string PartitionKey { get; set; }
+        public string PartitionKey
+        {
+            get => Id.ToString();
+            set => Id = Guid.Parse(value);
+        }
 
         public Address()
         {
 
         }
 
-        public Address(long id, long userId, long familyId, string name, string location, string postcode, string partitionKey)
+        public Address(Guid id, long userId, long familyId, string name, string location, string postcode, string partitionKey)
         {
             Id = id;
             UserId = userId;
@@ -68,8 +75,17 @@ namespace Models
     {
         public override IOpenApiExample<Address> Build(NamingStrategy NamingStrategy = null)
         {
-            Examples.Add(OpenApiExampleResolver.Resolve("Address", "This is an address summary", new Address() { Id = 1, UserId = 101, FamilyId = 1, Name = "Dirk Dirksma's huis", Location = "street123", Postcode = "AB1234", PartitionKey = "1" }, NamingStrategy));
-
+            Guid guid = Guid.NewGuid();
+            Examples.Add(OpenApiExampleResolver.Resolve("Address",
+                                new Address()
+                                {
+                                    UserId = 101,
+                                    FamilyId = 1,
+                                    Name = "Dirk Dirksma's huis",
+                                    Location = "street123",
+                                    Postcode = "AB1234"
+                                },
+                                NamingStrategy));
             return this;
         }
     }

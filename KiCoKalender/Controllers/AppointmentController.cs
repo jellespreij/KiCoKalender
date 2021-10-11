@@ -81,7 +81,7 @@ namespace Controllers
 			[HttpTrigger(AuthorizationLevel.Function,
 			"GET", Route = "appointment/{userId}")]
 			HttpRequestData req,
-			long userId,
+			Guid userId,
 			FunctionContext executionContext)
 		{
 			return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) => {
@@ -107,7 +107,7 @@ namespace Controllers
 			[HttpTrigger(AuthorizationLevel.Function,
 			"GET", Route = "appointment")]
 			HttpRequestData req,
-			long familyId,
+			Guid familyId,
 			FunctionContext executionContext)
 		{
 			return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) => {

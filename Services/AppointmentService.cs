@@ -27,12 +27,12 @@ namespace Services
             _appointmentRepository.Delete(appointment);
         }
 
-        public IEnumerable<Appointment> FindAppointmentByFamilyId(long familyId)
+        public IEnumerable<Appointment> FindAppointmentByFamilyId(Guid familyId)
         {
             return _appointmentRepository.FindBy(e => e.Id == familyId);
         }
 
-        public IEnumerable<Appointment> FindAppointmentByUserId(long userId)
+        public IEnumerable<Appointment> FindAppointmentByUserId(Guid userId)
         {
             return _appointmentRepository.FindBy(e => e.UserId == userId);
         }

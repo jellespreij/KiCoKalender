@@ -1,6 +1,6 @@
 ﻿using Microsoft.Azure.Storage;
 
-namespace KiCoKalender
+namespace Services
 {
     public static class StorageAccountSettings
     {

@@ -36,6 +36,7 @@ namespace Auth
 				catch (Exception e)
 				{
 					HttpResponseData Response = Request.CreateResponse(HttpStatusCode.BadRequest);
+					Console.WriteLine(e.Message);
 					return Response;
 				}
 			}

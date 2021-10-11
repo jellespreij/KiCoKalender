@@ -5,6 +5,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,8 +17,9 @@ namespace Models
 	public class User : IEntityBase
 	{
 		[OpenApiProperty(Description = "Gets or sets the ID.")]
-		[JsonRequired]
-		public long Id { get; set; }
+		[Key]
+		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+		public Guid Id { get; set; }
 
 		[OpenApiProperty(Description = "Username for the user logging in.")]
 		[JsonRequired]
@@ -27,8 +30,11 @@ namespace Models
 		public string Password { get; set; }
 
 		[OpenApiProperty(Description = "Gets or sets the partitionKey.")]
-		[JsonRequired]
-		public string PartitionKey { get; set; }
+        public string PartitionKey
+		{
+			get => Id.ToString();
+			set => Id = Guid.Parse(value);
+		}
 	}
 
 	public class UserExample : OpenApiExample<User>
@@ -39,8 +45,7 @@ namespace Models
 														new User()
 														{
 															Username = "Kim",
-															Password = "SuperSecretPassword123!!",
-															PartitionKey = "1"
+															Password = "SuperSecretPassword123!!"
 														},
 														NamingStrategy));
 
