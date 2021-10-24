@@ -1,26 +1,50 @@
-﻿using System.Runtime.Serialization;
-
+﻿using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Resolvers;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Models
 {
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum Folder
+    public class Folder : IEntityBase
     {
-		[EnumMember(Value = "Picture")]
-        Picture = 1,
+        [OpenApiProperty(Description = "Gets or sets the folder id.")]
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
 
-		[EnumMember(Value = "Medical")]
-        Medical = 2,
+        [OpenApiProperty(Description = "Gets or sets the name.")]
+        public string Name { get; set; }
 
-		[EnumMember(Value = "Finance")]
-        Finance = 3,
+        [OpenApiProperty(Description = "Gets or sets the foreign family ID.")]
+        public Guid? FamilyId { get; set; }
 
-        [EnumMember(Value = "School")]
-        School = 4,
+        [OpenApiProperty(Description = "Gets or sets the family.")]
+        [JsonIgnore]
+        public Family Family { get; set; }
+        
+        [OpenApiProperty(Description = "Gets or sets the assets.")]
+        [JsonIgnore]
+        public List<Asset> Assets { get; set; } = new List<Asset>();
 
-        [EnumMember(Value = "Other")]
-        Other = 5
+        public Folder()
+        {
+        }
+
+        public Folder(Guid id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+
+        [OpenApiProperty(Description = "Gets or sets the partitionKey.")]
+        public string PartitionKey { get; set; }
     }
 }

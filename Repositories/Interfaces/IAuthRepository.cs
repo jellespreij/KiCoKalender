@@ -10,6 +10,6 @@ namespace Repositories
 {
     public interface IAuthRepository : IBaseRepository<User>
     {
-        User FindUser(Expression<Func<User, bool>> predicate);
+        Task<User> FindUser(Expression<Func<User, bool>> predicate);
     }
 }

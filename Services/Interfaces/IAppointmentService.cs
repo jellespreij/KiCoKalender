@@ -9,10 +9,9 @@ namespace Services
 {
     public interface IAppointmentService
     {
-        IEnumerable<Appointment> FindAppointmentByUserId(Guid userId);
-        IEnumerable<Appointment> FindAppointmentByFamilyId(Guid familyId);
-        void AddAppointment(Appointment appointment);
-        void UpdateAppointment(Appointment appointment);
-        void DeleteAppointment(Appointment appointment);
+        IEnumerable<Appointment> FindAppointmentByFamilyIdAndUserId(Guid familyId, Guid userId);
+        Appointment AddAppointment(Appointment appointment);
+        Appointment UpdateAppointment(Appointment appointment, Guid id);
+        Appointment DeleteAppointment(Guid id);
     }
 }

@@ -2,6 +2,7 @@ using Auth;
 using Auth.Interfaces;
 using Context;
 using Controllers;
+using KiCoKalender.Configurations;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Extensions.OpenApi;
 using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Extensions;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Repositories;
 using Services;
+using System.IO;
 
 namespace KiCoKalender
 {
@@ -25,6 +27,7 @@ namespace KiCoKalender
 				.ConfigureServices(Configure)
 				.Build();
 
+
 			host.Run();
 		}
 
@@ -33,9 +36,9 @@ namespace KiCoKalender
 			Services.AddSingleton<IOpenApiHttpTriggerContext, OpenApiHttpTriggerContext>();
 			Services.AddSingleton<IOpenApiTriggerFunction, OpenApiTriggerFunction>();
 
-			Services.AddSingleton<UserContextController>();
-			Services.AddSingleton<IUserContextService, UserContextService>();
-			Services.AddTransient<IUserContextRepository, UserContextRepository>();
+			Services.AddSingleton<UserController>();
+			Services.AddSingleton<IUserService, UserService>();
+			Services.AddTransient<IUserRepository, UserRepository>();
 
 			Services.AddSingleton<AppointmentController>();
 			Services.AddSingleton<IAppointmentService, AppointmentService>();
@@ -43,19 +46,24 @@ namespace KiCoKalender
 
 			Services.AddSingleton<AssetController>();
 			Services.AddSingleton<IAssetService, AssetService>();
+			Services.AddSingleton<BlobService>();
 			Services.AddTransient<IAssetRepository, AssetRepository>();
 
 			Services.AddSingleton<FamilyController>();
 			Services.AddSingleton<IFamilyService, FamilyService>();
 			Services.AddTransient<IFamilyRepository, FamilyRepository>();
+			Services.AddTransient<IFolderRepository, FolderRepository>();
 
-			Services.AddSingleton<AddressController>();
-			Services.AddSingleton<IAddressService, AddressService>();
-			Services.AddTransient<IAddressRepository, AddressRepository>();
+			Services.AddSingleton<ContactController>();
+			Services.AddSingleton<IContactService, ContactService>();
+			Services.AddTransient<IContactRepository, ContactRepository>();
+
+			Services.AddSingleton<TransactionController>();
+			Services.AddSingleton<ITransactionService, TransactionService>();
+			Services.AddTransient<ITransactionRepository, TransactionRepository>();
 
 			Services.AddSingleton<AuthController>();
 			Services.AddSingleton<ITokenService, TokenService>();
-			Services.AddSingleton<IAuthService, AuthService>();
 			Services.AddSingleton<IAuthenticate, Authenticate>();
 			Services.AddTransient<IAuthRepository, AuthRepository>();
 

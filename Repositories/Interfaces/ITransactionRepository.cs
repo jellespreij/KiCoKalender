@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Models;
 
-namespace Models
+namespace Repositories
 {
-    public interface IEntityBase
+    public interface ITransactionRepository : IBaseRepository<Transaction>
     {
-        public Guid Id { get; set; }
     }
 }

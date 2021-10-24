@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Repositories
 {
-    public class UserContextRepository : BaseRepository<UserContext>, IUserContextRepository
+    public class TransactionRepository : BaseRepository<Transaction>, ITransactionRepository
     {
-        public UserContextRepository(CosmosDBContext cosmosDBContext) : base(cosmosDBContext) 
+        public TransactionRepository(CosmosDBContext cosmosDBContext) : base(cosmosDBContext)
         {
-            
+
         }
     }
 }

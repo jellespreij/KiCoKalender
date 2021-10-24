@@ -6,7 +6,7 @@ namespace Services
 {
 	public interface ITokenService
 	{
-		Task<LoginResult> CreateToken(User user);
+		Task<LoginResult> CreateToken(Login login);
 		Task<ClaimsPrincipal> GetByValue(string Value);
 	}
 }

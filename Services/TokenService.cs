@@ -10,6 +10,7 @@ using Models;
 using Microsoft.Extensions.Logging;
 using Repositories;
 using BCryptNet = BCrypt.Net.BCrypt;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Services
 {
@@ -34,7 +35,6 @@ namespace Services
         }
 
         private ILogger Logger { get; }
-
         private string Issuer { get; }
         private string Audience { get; }
         private TimeSpan ValidityDuration { get; }
@@ -59,18 +59,18 @@ namespace Services
             _authRepository = authRepository;
         }
 
-        public async Task<LoginResult> CreateToken(User user)
+        public async Task<LoginResult> CreateToken(Login login)
         {
-            User userObject = _authRepository.FindUser(e => e.Username == user.Username);
-            if (userObject is null || !BCryptNet.Verify(user.Password, userObject.Password))
+            User userObject = await _authRepository.FindUser(e => e.Email == login.Email);
+            if (userObject is null || !BCryptNet.Verify(login.Password, userObject.Password))
             {
-                throw new Exception("Invalid username or password");
+                return null;
             }
             else
             {
                 JwtSecurityToken Token = await CreateToken(new Claim[] {
                 new Claim(ClaimTypes.Role, "User"),
-                new Claim(ClaimTypes.Name, user.Username)
+                new Claim(ClaimTypes.Name, userObject.Id.ToString())
                 });
 
                 return new LoginResult(Token);
@@ -112,6 +112,7 @@ namespace Services
             }
             catch (Exception e)
             {
+                Logger.LogError("Error: ", e);
                 throw;
             }
         }

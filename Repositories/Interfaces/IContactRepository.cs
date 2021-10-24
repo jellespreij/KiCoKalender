@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Repositories
 {
-    public interface IAddressRepository : IBaseRepository<Address>
+    public interface IContactRepository : IBaseRepository<Contact>
     {
 
     }

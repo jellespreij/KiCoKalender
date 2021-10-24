@@ -9,10 +9,9 @@ namespace Services
 {
     public interface IAssetService
     {
-        IEnumerable<Asset> FindAssetByUserIdAndFolder(long userId, Folder folder);
-        IEnumerable<Asset> FindAssetByFamilyIdAndFolder(long familyId, Folder folder);
-        void AddAsset(Asset asset);
-        void DeleteAsset(Asset asset);
-        void UpdateAsset(Asset asset);
+        IEnumerable<Asset> FindAssetsByFolderId(Guid folderId);
+        Task<Asset> AddAsset(Asset asset, Guid folderId, string localUrl);
+        Task<Asset> DeleteAsset(Guid id);
+        Asset UpdateAsset(Asset asset, Guid id);
     }
 }

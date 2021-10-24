@@ -17,29 +17,24 @@ namespace Services
             _appointmentRepository = appointmentRepository;   
         }
 
-        public void AddAppointment(Appointment appointment)
+        public Appointment AddAppointment(Appointment appointment)
         {
-            _appointmentRepository.Add(appointment);
+            return _appointmentRepository.Add(appointment).Result;
         }
 
-        public void DeleteAppointment(Appointment appointment)
+        public Appointment DeleteAppointment(Guid id)
         {
-            _appointmentRepository.Delete(appointment);
+            return _appointmentRepository.Delete(id).Result;
         }
 
-        public IEnumerable<Appointment> FindAppointmentByFamilyId(Guid familyId)
+        public IEnumerable<Appointment> FindAppointmentByFamilyIdAndUserId(Guid familyId, Guid userId)
         {
-            return _appointmentRepository.FindBy(e => e.Id == familyId);
+            return _appointmentRepository.FindBy(e => e.FamilyId == familyId && (e.Privacy == false || (e.UserId == userId && e.Privacy == true)));
         }
 
-        public IEnumerable<Appointment> FindAppointmentByUserId(Guid userId)
+        public Appointment UpdateAppointment(Appointment appointment, Guid id)
         {
-            return _appointmentRepository.FindBy(e => e.UserId == userId);
-        }
-
-        public void UpdateAppointment(Appointment appointment)
-        {
-            _appointmentRepository.Update(appointment);
+            return _appointmentRepository.Update(appointment, id).Result;
         }
     }
 }

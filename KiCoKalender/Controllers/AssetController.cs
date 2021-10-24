@@ -19,200 +19,173 @@ using Attributes;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using static System.Net.Mime.MediaTypeNames;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace Controllers
 {
     class AssetController
     {
-		ILogger Logger { get; }
-		IAssetService AssetService { get; }
-		IAuthenticate Authenticate { get; }
-		public AssetController(ILogger<AssetController> Logger, IAssetService assetService, IAuthenticate authenticate)
-		{
-			this.Logger = Logger;
-			AssetService = assetService;
-			Authenticate = authenticate;
-		}
+        ILogger Logger { get; }
+        IAssetService AssetService { get; }
+        IAuthenticate Authenticate { get; }
+        public AssetController(ILogger<AssetController> Logger, IAssetService assetService, IAuthenticate authenticate)
+        {
+            this.Logger = Logger;
+            AssetService = assetService;
+            Authenticate = authenticate;
+        }
 
-		[Function("AddAsset")]
-		[UserAuth]
-		[OpenApiOperation(operationId: "AddAsset", tags: new[] { "asset" }, Summary = "Add an asset to the KiCoKalender", Description = "This adds an asset to the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
-		//[OpenApiParameter(name: "localUrl", In = ParameterLocation.Query, Required = true, Type = typeof(string), Summary = "folder of Assets to return", Description = "folder of Assets to return", Visibility = OpenApiVisibilityType.Important)]
-		//[OpenApiRequestBody(contentType: "application/octet-stream", bodyType: typeof(IFormFile), Required = true, Description = "Asset object that needs to be added to the KiCoKalender")]
-		//[OpenApiRequestBody(contentType: "multipart/form-data", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be added to the KiCoKalender")]
-		//[OpenApiParameter(name: "File", In = ParameterLocation.formData, Required = true, Type = typeof(File), Summary = "userId of Assets to return", Description = "userId of Assets to return", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be added to the KiCoKalender", Example = typeof(DummyAssetExample))]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "New asset added", Description = "New asset added")]
-		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Invalid input", Description = "Invalid input")]
-		[UnauthorizedResponse]
-		[ForbiddenResponse]
-		public async Task<HttpResponseData> AddAsset(
-			[HttpTrigger(AuthorizationLevel.Function,
-			"POST", Route = "asset")]
-			HttpRequestData req,
-			FunctionContext executionContext)
-		{
-			return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) => {
-				var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+        [Function("AddAsset")]
+        [UserAuth]
+        [OpenApiOperation(operationId: "AddAsset", tags: new[] { "asset" }, Summary = "Add an asset to the KiCoKalender", Description = "This adds an asset to the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiParameter(name: "localUrl", In = ParameterLocation.Query, Required = true, Type = typeof(string), Summary = "Url of image", Description = "Url of image", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiParameter(name: "folderId", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "FolderId of Assets to return", Description = "FolderId of Assets to return", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be added to the KiCoKalender", Example = typeof(DummyAssetExample))]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "New asset added", Description = "New asset added")]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid input", Description = "Invalid input")]
+        [UnauthorizedResponse]
+        [ForbiddenResponse]
+        public async Task<HttpResponseData> AddAsset(
+            [HttpTrigger(AuthorizationLevel.Function,
+            "POST", Route = "asset")]
+            HttpRequestData req,
+            string localUrl,
+            string folderId,
+            FunctionContext executionContext)
+        {
+            return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) =>
+            {
+                HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
+                try
+                {
+                    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                    Asset asset = JsonConvert.DeserializeObject<Asset>(requestBody);
 
-				Asset asset = JsonConvert.DeserializeObject<Asset>(requestBody);
-				// Generate output
-				HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
-			
-			if (asset is null)
-			{
-				response = req.CreateResponse(HttpStatusCode.BadRequest);
-			}
-			else
-			{
-				AssetService.AddAsset(asset);
-			}
-			
-				return response;
-			});
-		}
+                    if (asset is null)
+                    {
+                        response = req.CreateResponse(HttpStatusCode.BadRequest);
+                    }
+                    else
+                    {
+                        Asset addedAsset = AssetService.AddAsset(asset, Guid.Parse(folderId), localUrl).Result;
+                        await response.WriteAsJsonAsync(addedAsset);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError("Invalid input", ex);
+                    response = req.CreateResponse(HttpStatusCode.BadRequest);
+                }
 
-		[Function("FindAssetsByUserIdAndFolder")]
-		[UserAuth]
-		[OpenApiOperation(operationId: "FindAssetsByUserIdAndFolder", tags: new[] { "asset" }, Summary = "Find assets by userId and folder", Description = "Returns assets by userId and folder.", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(long), Summary = "userId of Assets to return", Description = "userId of Assets to return", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiParameter(name: "folder", In = ParameterLocation.Query, Required = true, Type = typeof(List<Folder>), Summary = "folder of Assets to return", Description = "folder of Assets to return", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(IEnumerable<Asset>), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyAssetExample))]
-		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID or Role supplied", Description = "Invalid ID or Role supplied")]
-		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Assets not found", Description = "Assets not found")]
-		[UnauthorizedResponse]
-		[ForbiddenResponse]
-		public async Task<HttpResponseData> FindAssetsByUserIdAndFolder(
-			[HttpTrigger(AuthorizationLevel.Function,
-			"GET", Route = "asset/{userId}")]
-			HttpRequestData req,
-			long userId,
-			string folder,
-			FunctionContext executionContext)
-		{
-			return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) => {
-			// Generate output
-			HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
+                return response;
+            });
+        }
 
-			if (folder is null)
-			{
-				response = req.CreateResponse(HttpStatusCode.BadRequest);
-			}
-			else
-			{
-				await response.WriteAsJsonAsync(AssetService.FindAssetByUserIdAndFolder(userId, (Folder)Enum.Parse(typeof(Folder), folder)));
-			}
+        [Function("FindAssetsByFolderId")]
+        [UserAuth]
+        [OpenApiOperation(operationId: "FindAssetsByFolderId", tags: new[] { "asset" }, Summary = "Find assets by familyId and folder", Description = "Returns assets by familyId and folder.", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiParameter(name: "folderId", In = ParameterLocation.Path, Required = true, Type = typeof(Guid), Summary = "FolderId of Assets to return", Description = "FolderId of Assets to return", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(IEnumerable<Asset>), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyAssetExample))]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Assets not found", Description = "Assets not found")]
+        [UnauthorizedResponse]
+        [ForbiddenResponse]
+        public async Task<HttpResponseData> FindAssetsByFolderId(
+            [HttpTrigger(AuthorizationLevel.Function,
+            "GET", Route = "asset/{folderId}")]
+            HttpRequestData req,
+            string folderId,
+            FunctionContext executionContext)
+        {
+            return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) =>
+            {
+                HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-			return response;
-			});
-		}
+                IEnumerable<Asset> assets = AssetService.FindAssetsByFolderId(Guid.Parse(folderId));
 
-		[Function("FindAssetsByFamilyIdAndFolder")]
-		[UserAuth]
-		[OpenApiOperation(operationId: "FindAssetsByFamilyIdAndFolder", tags: new[] { "asset" }, Summary = "Find assets by familyId and folder", Description = "Returns assets by familyId and folder.", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiParameter(name: "familyId", In = ParameterLocation.Query, Required = true, Type = typeof(long), Summary = "familyId of Assets to return", Description = "familyId of Assets to return", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiParameter(name: "folder", In = ParameterLocation.Query, Required = true, Type = typeof(List<Folder>), Summary = "folder of Assets to return", Description = "folder of Assets to return", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(IEnumerable<Asset>), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyAssetExample))]
-		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
-		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Assets not found", Description = "Assets not found")]
-		[UnauthorizedResponse]
-		[ForbiddenResponse]
-		public async Task<HttpResponseData> FindAssetsByFamilyIdAndFolder(
-			[HttpTrigger(AuthorizationLevel.Function,
-			"GET", Route = "asset")]
-			HttpRequestData req,
-			long familyId,
-			string folder,
-			FunctionContext executionContext)
-		{
-			return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) => {
-			// Generate output
-			HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
+                if (assets.Any())
+                {
+                    await response.WriteAsJsonAsync(assets);
+                }
+                else
+                {
+                    response = req.CreateResponse(HttpStatusCode.NotFound);
+                }
+                return response;
+            });
+        }
 
-			if (folder is null)
-			{
-				response = req.CreateResponse(HttpStatusCode.BadRequest);
-			}
-			else
-			{
-				await response.WriteAsJsonAsync(AssetService.FindAssetByFamilyIdAndFolder(familyId, (Folder)Enum.Parse(typeof(Folder), folder)));
-			}
+        [Function("DeleteAsset")]
+        [UserAuth]
+        [OpenApiOperation(operationId: "DeleteAsset", tags: new[] { "asset" }, Summary = "Deletes an asset from the KiCoKalender", Description = "This Deletes an asset from the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiParameter(name: "id", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "Id of Assets to return", Description = "Id of Assets to return", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(User), Summary = "Asset Deleted", Description = "Asset deleted")]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid input", Description = "Invalid input")]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Asset not found", Description = "Asset not found")]
+        [UnauthorizedResponse]
+        [ForbiddenResponse]
+        public async Task<HttpResponseData> DeleteAsset(
+            [HttpTrigger(AuthorizationLevel.Function,
+            "DELETE", Route = "asset")]
+            HttpRequestData req,
+            string id,
+            FunctionContext executionContext)
+        {
+            return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) =>
+            {
+                HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-			return response;
-			});
-		}
+                Asset deletedAsset = AssetService.DeleteAsset(Guid.Parse(id)).Result;
 
-		[Function("DeleteAsset")]
-		[UserAuth]
-		[OpenApiOperation(operationId: "DeleteAsset", tags: new[] { "asset" }, Summary = "Deletes an asset from the KiCoKalender", Description = "This Deletes an asset from the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be Deleted from the KiCoKalender", Example = typeof(DummyAssetExample))]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(UserContext), Summary = "Asset Deleted", Description = "Asset deleted")]
-		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid input", Description = "Invalid input")]
-		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Asset not found", Description = "Asset not found")]
-		[UnauthorizedResponse]
-		[ForbiddenResponse]
-		public async Task<HttpResponseData> DeleteAsset(
-			[HttpTrigger(AuthorizationLevel.Function,
-			"DELETE", Route = "asset")]
-			HttpRequestData req,
-			FunctionContext executionContext)
-		{
-			return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) => {
-			// Parse input
-			string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-			Asset asset = JsonConvert.DeserializeObject<Asset>(requestBody);
+                if (deletedAsset is null)
+                {
+                    response = req.CreateResponse(HttpStatusCode.NotFound);
+                }
 
-			// Generate output
-			HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
+                return response;
+            });
+        }
 
-			if (asset is null)
-			{
-				response = req.CreateResponse(HttpStatusCode.BadRequest);
-			}
-			else
-			{
-				AssetService.DeleteAsset(asset);
-			}
+        [Function("UpdateAsset")]
+        [UserAuth]
+        [OpenApiOperation(operationId: "UpdateAsset", tags: new[] { "asset" }, Summary = "Update an existing Asset", Description = "This updates an existing Asset.", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiParameter(name: "id", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "Id of Assets to return", Description = "Id of Assets to return", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be updated")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "Asset details updated", Description = "Asset details updated", Example = typeof(DummyAssetExample))]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Asset not found", Description = "Asset not found")]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Validation exception", Description = "Validation exception")]
+        [UnauthorizedResponse]
+        [ForbiddenResponse]
+        public async Task<HttpResponseData> UpdateAsset(
+            [HttpTrigger(AuthorizationLevel.Function, "PUT", Route = "asset")]
+            HttpRequestData req,
+            string id,
+            FunctionContext executionContext)
+        {
+            return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) =>
+            {
+                HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
+                try
+                {
+                    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                    Asset asset = JsonConvert.DeserializeObject<Asset>(requestBody);
 
-			return response;
-			});
-		}
+                    Asset updatedAsset = AssetService.UpdateAsset(asset, Guid.Parse(id));
 
-		[Function("UpdateAsset")]
-		[UserAuth]
-		[OpenApiOperation(operationId: "UpdateAsset", tags: new[] { "asset" }, Summary = "Update an existing Asset", Description = "This updates an existing Asset.", Visibility = OpenApiVisibilityType.Important)]
-		[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be updated")]
-		[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "Asset details updated", Description = "Asset details updated", Example = typeof(DummyAssetExample))]
-		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Asset not found", Description = "Asset not found")]
-		[OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Validation exception", Description = "Validation exception")]
-		[UnauthorizedResponse]
-		[ForbiddenResponse]
-		public async Task<HttpResponseData> UpdateAsset(
-			[HttpTrigger(AuthorizationLevel.Function, "PUT", Route = "asset")]
-			HttpRequestData req,
-			FunctionContext executionContext)
-		{
-			return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) => {
-			// Parse input
-			string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-			Asset asset = JsonConvert.DeserializeObject<Asset>(requestBody);
+                    if (updatedAsset is null)
+                    {
+                        response = req.CreateResponse(HttpStatusCode.BadRequest);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError("Invalid input", ex);
+                    response = req.CreateResponse(HttpStatusCode.BadRequest);
+                }
 
-			// Generate output
-			HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
-
-			if (asset is null)
-			{
-				response = req.CreateResponse(HttpStatusCode.BadRequest);
-			}
-			else
-			{
-				AssetService.UpdateAsset(asset);
-			}
-
-			await response.WriteAsJsonAsync(asset);
-
-			return response;
-			});
-		}
-	}
+                return response;
+            });
+        }
+    }
 }

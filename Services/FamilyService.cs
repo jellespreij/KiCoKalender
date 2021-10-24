@@ -18,40 +18,45 @@ namespace Services
         {
             _familyRepository = familyRepository;
         }
-        public void AddFamily(Family family)
+
+        public Family AddFamily(Family family)
         {
-            _familyRepository.Add(family);
+            return _familyRepository.Add(family).Result;
         }
 
-        public void DeleteFamily(Family family)
+        public Family DeleteFamily(Guid id)
         {
-            _familyRepository.Delete(family);
+            return _familyRepository.Delete(id).Result;
         }
 
-        public IEnumerable<Family> FindFamilyByUserIdAndRole(Guid userId, Role role)
+        public Family FindFamilyByFamilyId(Guid familyId)
         {
-            //return _familyRepository.FindBy(e => e.Id == 1);
-            return _familyRepository.FindBy(e => e.Parents.Any(x => x.Id == userId));
+            return _familyRepository.GetSingle(familyId);
         }
 
         public async void SendMail(string toEmail)
         {
-            var apiKey = "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";
+            var apiKey = "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";
 
             //var apiKey = Environment.GetEnvironmentVariable("emailSender");
             var client = new SendGridClient(apiKey);
-            var from = new EmailAddress("565459@student.inholland.nl");
-            var subject = "Inivitation KiCoKalender";
+            var from = new EmailAddress("kimvangelder@kpnmail.nl");
+            var subject = "Uitnodiging KiCoKalender";
             var to = new EmailAddress(toEmail);
             var plainTextContent = "Ik zou graag willen dat je de KiCoKalender download zodat wij beter kunnen communiceren tijdens de scheiding.";
-            var htmlContent = "<h3>Dear ..</h3><p>Ik zou graag willen dat je de KiCoKalender download zodat wij beter kunnen communiceren tijdens de scheiding.</p></n><p>Vriendelijke groet, "+ from.Email+"</p>";
+            var htmlContent = "<h3>Beste Ontvanger ..</h3><p>Ik zou graag willen dat je de KiCoKalender download zodat wij beter kunnen communiceren tijdens de scheiding.</p></n><p>Vriendelijke groet, "+ from.Email+"</p>";
             var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
             await client.SendEmailAsync(msg);
         }
 
-        public void UpdateFamily(Family family)
+        public void AddUserToFamily(User user, Guid id)
         {
-            _familyRepository.Update(family);
+            _familyRepository.AddUserToFamily(user, id);
+        }
+        
+        public void AddFolderToFamily(Folder folder, Guid id)
+        {
+            _familyRepository.AddFolderToFamily(folder, id);
         }
     }
 }

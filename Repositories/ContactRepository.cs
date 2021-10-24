@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Repositories
 {
-    public class AddressRepository : BaseRepository<Address>, IAddressRepository
+    public class ContactRepository : BaseRepository<Contact>, IContactRepository
     {
-        public AddressRepository(CosmosDBContext cosmosDBContext) : base(cosmosDBContext)
+        public ContactRepository(CosmosDBContext cosmosDBContext) : base(cosmosDBContext)
         {
 
         }

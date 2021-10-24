@@ -11,7 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "Models\Models.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repositories", "Repositories\Repositories.csproj", "{CA6394C3-44B1-47C8-8A61-8EFD0252C424}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth", "Auth\Auth.csproj", "{98DCDEAF-621F-4139-98CF-C2983B43C361}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Auth", "Auth\Auth.csproj", "{98DCDEAF-621F-4139-98CF-C2983B43C361}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUnitTestingServices", "NUnitTestingServices\NUnitTestingServices.csproj", "{8E6699F7-0A79-4532-B11B-A6D02AD0E63B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnitTestingControllers", "NUnitTestingControllers\NUnitTestingControllers.csproj", "{6AD317F4-BDA1-471E-8937-BC5C8F91D41C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +43,14 @@ Global
 		{98DCDEAF-621F-4139-98CF-C2983B43C361}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98DCDEAF-621F-4139-98CF-C2983B43C361}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98DCDEAF-621F-4139-98CF-C2983B43C361}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E6699F7-0A79-4532-B11B-A6D02AD0E63B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E6699F7-0A79-4532-B11B-A6D02AD0E63B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E6699F7-0A79-4532-B11B-A6D02AD0E63B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E6699F7-0A79-4532-B11B-A6D02AD0E63B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AD317F4-BDA1-471E-8937-BC5C8F91D41C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AD317F4-BDA1-471E-8937-BC5C8F91D41C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AD317F4-BDA1-471E-8937-BC5C8F91D41C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AD317F4-BDA1-471E-8937-BC5C8F91D41C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

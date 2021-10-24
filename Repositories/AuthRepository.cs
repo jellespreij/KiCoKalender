@@ -16,8 +16,10 @@ namespace Repositories
 
         }
 
-        public User FindUser(Expression<Func<User, bool>> predicate)
+        public async Task<User> FindUser(Expression<Func<User, bool>> predicate)
         {
+            await _context.Database.EnsureCreatedAsync();
+
             return _context.Users.FirstOrDefault(predicate);
         }
     }

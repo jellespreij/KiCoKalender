@@ -21,9 +21,9 @@ namespace Models
 		[JsonRequired]
 		public string TokenType => "Bearer";
 
-		[OpenApiProperty(Description = "The amount of seconds until the token expires.")]
-		[JsonRequired]
-		public int ExpiresIn => (int)(Token.ValidTo - DateTime.UtcNow).TotalSeconds;
+        [OpenApiProperty(Description = "The amount of seconds until the token expires.")]
+        [JsonRequired]
+        public int ExpiresIn => (int)(Token.ValidTo - DateTime.UtcNow).TotalSeconds;
 
 		public LoginResult(JwtSecurityToken Token)
 		{

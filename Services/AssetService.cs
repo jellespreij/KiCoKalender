@@ -13,72 +13,65 @@ namespace Services
     public class AssetService : IAssetService
     {
         private IAssetRepository _assetRepository;
+        private IFolderRepository _folderRepository;
+        private BlobService _blobService;
 
-        private const string CONTAINERPREFIX = "powerpuffgirls";
-
-        public AssetService(IAssetRepository assetRepository)
+        public AssetService(IAssetRepository assetRepository, IFolderRepository folderRepository, BlobService blobService)
         {
             _assetRepository = assetRepository;
+            _folderRepository = folderRepository;
+            _blobService = blobService;
         }
 
-        public async void AddAsset(Asset asset)
+        public async Task<Asset> AddAsset(Asset asset, Guid folderId, string localUrl)
         {
-           // _assetRepository.Add(asset);
+            Folder folder = _folderRepository.GetSingle(folderId);
 
-            CloudStorageAccount storageAccount = StorageAccountSettings.CreateStorageAccountFromConnectionString();
+            CloudBlobContainer container = await _blobService.GetBlobContainer();
 
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            string[] urlParts = localUrl.Split("\\", System.StringSplitOptions.RemoveEmptyEntries);
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(folder.Name + "/" + urlParts.Last());
 
-            CloudBlobContainer container = blobClient.GetContainerReference(CONTAINERPREFIX);
             try
             {
-                // Retry policy - optional
-                BlobRequestOptions optionsWithRetryPolicy = new BlobRequestOptions() { RetryPolicy = new Microsoft.Azure.Storage.RetryPolicies.LinearRetry(TimeSpan.FromSeconds(20), 4) };
-
-                await container.CreateIfNotExistsAsync(optionsWithRetryPolicy, null);
+                using (var filestream = System.IO.File.OpenRead(@localUrl))
+                {
+                    blockBlob.UploadFromStream(filestream);
+                }
             }
             catch (StorageException ex)
             {
                 Console.WriteLine(ex.Message);
             }
 
-            // await container.SetPermissionsAsync(new BlobContainerPermissions { PublicAccess = BlobContainerPublicAccessType.Blob });
+            asset.Url = blockBlob.Uri.ToString();
+            asset.Name = urlParts.Last();
 
-            // Upload a BlockBlob(.png) to the newly created container
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference(asset.Url);
-
-            // Browser now knows it as an image.
-            blockBlob.Properties.ContentType = "image/jpg";
-
-            try
-            {
-                await blockBlob.UploadFromFileAsync(asset.Url);
-            }
-            catch (StorageException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
+            Asset addedAsset = await _assetRepository.Add(asset);
+            return _assetRepository.AddAssetToFolder(folder, addedAsset.Id).Result;
         }
 
-        public void DeleteAsset(Asset asset)
+        public async Task<Asset> DeleteAsset(Guid id)
         {
-            _assetRepository.Delete(asset);
+            Asset asset = _assetRepository.GetSingle(id);
+
+            CloudBlobContainer container = await _blobService.GetBlobContainer();
+
+            var blob = container.GetBlobReference(asset.Folder.Name + "/" + asset.Name); 
+            await blob.DeleteIfExistsAsync();
+
+            _folderRepository.RemoveAssetFromFolder(asset);
+            return _assetRepository.Delete(id).Result;
         }
 
-        public IEnumerable<Asset> FindAssetByUserIdAndFolder(long userId, Folder folder)
+        public IEnumerable<Asset> FindAssetsByFolderId(Guid folderId)
         {
-            return _assetRepository.FindBy(e => e.UserId == userId && e.Folder == folder);
+            return _assetRepository.FindBy(e => e.FolderId == folderId);
         }
 
-        public IEnumerable<Asset> FindAssetByFamilyIdAndFolder(long familyId, Folder folder)
+        public Asset UpdateAsset(Asset asset, Guid id)
         {
-            return _assetRepository.FindBy(e => e.FamilyId == familyId && e.Folder == folder);
-        }
-
-        public void UpdateAsset(Asset asset)
-        {
-            _assetRepository.Update(asset);
+            return _assetRepository.Update(asset, id).Result;
         }
     }
 }

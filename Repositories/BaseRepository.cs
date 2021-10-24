@@ -1,4 +1,5 @@
 ﻿using Context;
+using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,34 +32,49 @@ namespace Repositories
             return _context.Set<T>().Where(predicate);
         }
 
-
-        public async void Add(T entity)
+        public async Task<T> Add(T entity)
         {
             await _context.Database.EnsureCreatedAsync();
-
-            EntityEntry dbEntityEntry = _context.Entry<T>(entity);
             _context.Set<T>().Add(entity);
 
-            await _context.SaveChangesAsync();
+            Commit();
+
+            return entity;
         }
 
-        public async void Delete(T entity)
+        public async Task<T> Delete(Guid id)
         {
             await _context.Database.EnsureCreatedAsync();
 
-            EntityEntry dbEntityEntry = _context.Entry<T>(entity);
-            dbEntityEntry.State = EntityState.Deleted;
+            var itemToDelete = _context.Set<T>().Where(entity => entity.Id == id).FirstOrDefault();
 
-            await _context.SaveChangesAsync();
+            if(itemToDelete is not null)
+            {
+                EntityEntry dbEntityEntry = _context.Entry(itemToDelete);
+                dbEntityEntry.State = EntityState.Deleted;
+                Commit();
+            }
+
+            return itemToDelete;
         }
 
-        public async void Update(T entity)
+        public async Task<T> Update(T entity, Guid id)
         {
             await _context.Database.EnsureCreatedAsync();
 
-            EntityEntry dbEntityEntry = _context.Entry<T>(entity);
-            dbEntityEntry.State = EntityState.Modified;
+            var itemToUpdate = _context.Set<T>().Where(entity => entity.Id == id).FirstOrDefault();
 
+            if (itemToUpdate is not null)
+            {
+                _context.Entry(itemToUpdate).CurrentValues.SetValues(entity);
+                Commit();
+            }
+
+            return itemToUpdate;
+        }
+
+        public async void Commit()
+        {
             await _context.SaveChangesAsync();
         }
     }

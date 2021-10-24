@@ -21,50 +21,41 @@ namespace Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
-        [OpenApiProperty(Description = "Gets or sets the user id.")]
+        [OpenApiProperty(Description = "Gets or sets the asset name.")]
         [JsonRequired]
-        public long UserId { get; set; }
-
-        [OpenApiProperty(Description = "Gets or sets the family id.")]
-        [JsonRequired]
-        public long FamilyId { get; set; }
+        public string Name { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the description.")]
-        [JsonRequired]
         public string Description { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the created date.")]
         [JsonRequired]
         public DateTime CreatedDate { get; set; }
 
-        [OpenApiProperty(Description = "Gets or sets the assets enum.")]
-        [JsonRequired]
+        [OpenApiProperty(Description = "Gets or sets the foreign family ID.")]
+        public Guid? FolderId { get; set; }
+
+        [OpenApiProperty(Description = "Gets or sets the family.")]
+        [JsonIgnore]
         public Folder Folder { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the assets url.")]
-
         public string Url { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the partitionKey.")]
-        public string PartitionKey
-        {
-            get => Id.ToString();
-            set => Id = Guid.Parse(value);
-        }
+        public string PartitionKey { get; set; }
 
         public Asset()
         {
 
         }
 
-        public Asset(Guid id, long userId, long familyId, string description, DateTime createdDate, Folder folder, string url, string partitionKey)
+        public Asset(Guid id, string name, string description, DateTime createdDate, string url, bool privacy, string partitionKey)
         {
             Id = id;
-            UserId = userId;
-            FamilyId = familyId;
+            Name = name;
             Description = description;
             CreatedDate = createdDate;
-            Folder = folder;
             Url = url;
             PartitionKey = partitionKey;
         }
@@ -77,12 +68,10 @@ namespace Models
             Examples.Add(OpenApiExampleResolver.Resolve("Asset",
                                 new Asset()
                                 {
-                                    UserId = 101,
-                                    FamilyId = 1,
+                                    Name = "name",
                                     Description = "This is an asset",
                                     CreatedDate = DateTime.Now,
-                                    Folder = Folder.Picture,
-                                    Url = "-url-"
+                                    Url = "-url-",
                                 },
                                 NamingStrategy));
             return this;

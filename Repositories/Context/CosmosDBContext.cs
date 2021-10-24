@@ -11,13 +11,13 @@ namespace Context
 {
     public class CosmosDBContext : DbContext
     {
-        public DbSet<UserContext> UserContexts { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Asset> Assets { get; set; }
         public DbSet<Family> Families { get; set; }
-        public DbSet<Address> Addresses { get; set; }
-        public DbSet<User> Users { get; set; }
-
+        public DbSet<Contact> Contacts { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Folder> Folders { get; set; }
 
         //DONT FORGET TO NUGET INSTALL: Install-Package Microsoft.EntityFrameworkCore.Cosmos -Version 5.0.10 for DbContextbuilder Use Cosmos
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -30,17 +30,18 @@ namespace Context
         {
             modelBuilder.HasDefaultContainer("Containers");
 
-            modelBuilder.Entity<UserContext>()
-                .ToContainer("userContexts");
+            modelBuilder.Entity<User>()
+                .ToContainer("users");
 
-            modelBuilder.Entity<UserContext>()
+            modelBuilder.Entity<User>()
                 .HasNoDiscriminator();
 
-            modelBuilder.Entity<UserContext>()
-                .HasPartitionKey(u => u.PartitionKey);
-
-            modelBuilder.Entity<UserContext>()
+            modelBuilder.Entity<User>()
                 .UseETagConcurrency();
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
 
             modelBuilder.Entity<Appointment>()
                 .ToContainer("appointments");
@@ -78,29 +79,56 @@ namespace Context
             modelBuilder.Entity<Family>()
                 .UseETagConcurrency();
 
-            modelBuilder.Entity<Address>()
-                .ToContainer("addresses");
+            modelBuilder.Entity<Family>()
+               .HasMany(f => f.Users)
+               .WithOne(u => u.Family)
+               .HasForeignKey(u => u.FamilyId);
 
-            modelBuilder.Entity<Address>()
+            modelBuilder.Entity<Family>()
+                .HasMany(f => f.Folders)
+                .WithOne(fo => fo.Family)
+                .HasForeignKey(fo => fo.FamilyId); 
+
+            modelBuilder.Entity<Contact>()
+                .ToContainer("contacts");
+
+            modelBuilder.Entity<Contact>()
                 .HasNoDiscriminator();
 
-            modelBuilder.Entity<Address>()
-                .HasPartitionKey(ad => ad.PartitionKey);
+            modelBuilder.Entity<Contact>()
+                .HasPartitionKey(c => c.PartitionKey);
 
-            modelBuilder.Entity<Address>()
+            modelBuilder.Entity<Contact>()
                 .UseETagConcurrency();
 
-            modelBuilder.Entity<User>()
-                .ToContainer("users");
+            modelBuilder.Entity<Transaction>()
+                .ToContainer("transactions");
 
-            modelBuilder.Entity<User>()
+            modelBuilder.Entity<Transaction>()
                 .HasNoDiscriminator();
 
-            modelBuilder.Entity<User>()
-                .HasPartitionKey(us => us.PartitionKey);
+            modelBuilder.Entity<Transaction>()
+                .HasPartitionKey(t => t.PartitionKey);
 
-            modelBuilder.Entity<User>()
+            modelBuilder.Entity<Transaction>()
                 .UseETagConcurrency();
+
+            modelBuilder.Entity<Folder>()
+               .ToContainer("folders");
+
+            modelBuilder.Entity<Folder>()
+                .HasNoDiscriminator();
+
+            modelBuilder.Entity<Folder>()
+                .HasPartitionKey(f => f.PartitionKey);
+
+            modelBuilder.Entity<Folder>()
+                .UseETagConcurrency();
+
+            modelBuilder.Entity<Folder>()
+              .HasMany(fo => fo.Assets)
+              .WithOne(a => a.Folder)
+              .HasForeignKey(a => a.FolderId);
         }
     }
 }

@@ -9,10 +9,11 @@ namespace Services
 {
     public interface IFamilyService
     {
-        IEnumerable<Family> FindFamilyByUserIdAndRole(Guid userId, Role role);
-        void AddFamily(Family family);
-        void UpdateFamily(Family family);
-        void DeleteFamily(Family family);
+        Family FindFamilyByFamilyId(Guid familyId);
+        Family AddFamily(Family family);
+        void AddUserToFamily(User user, Guid id);
+        void AddFolderToFamily(Folder folder, Guid id);
+        Family DeleteFamily(Guid id);
         void SendMail(string toEmail);
     }
 }

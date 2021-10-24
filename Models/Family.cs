@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Resolvers;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
@@ -14,17 +15,17 @@ namespace Models
 {
     [OpenApiExample(typeof(DummyFamilyExample))]
     public class Family : IEntityBase
-    {
+    {  
         [OpenApiProperty(Description = "Gets or sets the family id.")]
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
-        [OpenApiProperty(Description = "Gets or sets the family parentIds.")]
-        public virtual List<UserContext> Parents { get; set; }
+        [OpenApiProperty(Description = "Gets or sets the users.")]
+        public List<User> Users { get; set; } = new List<User>();
 
-        [OpenApiProperty(Description = "Gets or sets the family childrenIds.")]
-        public virtual List<UserContext> Children { get; set; }
+        [OpenApiProperty(Description = "Gets or sets the users.")]
+        public List<Folder> Folders { get; set; } = new List<Folder>();
 
         [OpenApiProperty(Description = "Gets or sets the name.")]
         public string Name { get; set; }
@@ -36,18 +37,16 @@ namespace Models
             set => Id = Guid.Parse(value);
         }
 
-        public Family() 
+        public Family()
         {
-        
+
         }
 
-        public Family(Guid id, List<UserContext> parents, List<UserContext> children, string name, string partitionKey)
+        public Family(Guid id, List<User> users, string name)
         {
             Id = id;
-            Parents = parents;
-            Children = children;
+            Users = users;
             Name = name;
-            PartitionKey = partitionKey;
         }
     }
 
@@ -55,42 +54,23 @@ namespace Models
     {
         public override IOpenApiExample<Family> Build(NamingStrategy NamingStrategy = null)
         {
-            List < UserContext > parents = new();
-            Examples.Add(OpenApiExampleResolver.Resolve("Jelle",
-                                            new UserContext()
-                                            {
-                                                Name = "Jelle Spreij",
-                                                Address = "straat1234",
-                                                Email = "-email-",
-                                                Age = DateTime.Now,
-                                                Created = DateTime.Now,
-                                                Postcode = "AB1234",
-                                                Role = Role.Parent
-                                            },
-                                            NamingStrategy));
+            List<User> users = new();
 
-            List<UserContext> children = new();
-            Examples.Add(OpenApiExampleResolver.Resolve("Baas",
-                                            new UserContext()
-                                            {
-                                                Name = "Baas b",
-                                                Address = "straat4321",
-                                                Email = "-email-",
-                                                Age = DateTime.Now,
-                                                Created = DateTime.Now,
-                                                Postcode = "AB1234",
-                                                Role = Role.Child
-                                            },
-                                            NamingStrategy));
+            users.Add(
+                new User()
+                {
+                    FirstName = "Jelle",
+                    LastName = "Spreij",
+                    Password = "-pass-",
+                    Address = "straat1234",
+                    Email = "-email-",
+                    Age = DateTime.Now,
+                    Created = DateTime.Now,
+                    Postcode = "AB1234",
+                    Role = Role.Parent
+                });
 
-            // List<UserContext> parents = new();
-            // parents.Add(new UserContext() { Id = Guid.NewGuid(), Name = "Jelle Spreij", Address = "straat1234", Email = "-email-", Age = DateTime.Now, Created = DateTime.Now, Postcode = "AB1234", Role = Role.Parent, PartitionKey = "1"});
-
-            //List<UserContext> children = new();
-            //children.Add(new UserContext() { Id = Guid.NewGuid(), Name = "Baas b", Address = "straat4321", Email = "-email-", Age = DateTime.Now, Created = DateTime.Now, Postcode = "AB1234", Role = Role.Child, PartitionKey = "3" });
-
-
-            Examples.Add(OpenApiExampleResolver.Resolve("Family", "This is a family summary", new Family() { Parents = parents, Children = children, Name = "family name" }, NamingStrategy));
+            Examples.Add(OpenApiExampleResolver.Resolve("Family", "This is a family summary", new Family() { Users = users, Name = "family name" }, NamingStrategy));
 
             return this;
         }

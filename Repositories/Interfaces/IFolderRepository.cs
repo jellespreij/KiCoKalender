@@ -2,14 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Repositories
 {
-    public interface IUserContextRepository : IBaseRepository<UserContext>
+    public interface IFolderRepository : IBaseRepository<Folder>
     {
-
+        public void RemoveAssetFromFolder(Asset asset);
     }
 }

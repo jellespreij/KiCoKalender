@@ -12,8 +12,9 @@ namespace Repositories
     {
         T GetSingle(Guid id);
         IEnumerable<T> FindBy(Expression<Func<T, bool>> predicate);
-        void Add(T item);
-        void Update(T item);
-        void Delete(T item);
+        Task<T> Add(T item);
+        Task<T> Update(T item, Guid id);
+        Task<T> Delete(Guid id);
+        void Commit();
     }
 }

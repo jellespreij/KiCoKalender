@@ -3,6 +3,7 @@
 
 # Azure Functions localsettings file
 local.settings.json
+ApiKey.properties
 
 # User-specific files
 *.suo
