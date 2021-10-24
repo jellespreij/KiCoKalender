@@ -11,5 +11,6 @@ namespace Repositories
     {
         void AddUserToFamily(User user, Guid id);
         void AddFolderToFamily(Folder folder, Guid id);
+        void RemoveUserFromFamily(User user);
     }
 }

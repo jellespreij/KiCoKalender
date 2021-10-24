@@ -37,5 +37,15 @@ namespace Repositories
 
             Commit();
         }
+
+        public async void RemoveUserFromFamily(User user)
+        {
+            await _context.Database.EnsureCreatedAsync();
+
+            var familyToUpdate = _context.Set<Family>().Where(entity => entity.Id == user.FamilyId).FirstOrDefault();
+            familyToUpdate.Users.Remove(user);
+
+            Commit();
+        }
     }
 }

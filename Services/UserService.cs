@@ -11,10 +11,12 @@ namespace Services
     public class UserService : IUserService
     {
         private IUserRepository _userRepository;
+        private IFamilyRepository _familyRepository;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IFamilyRepository familyRepository)
         {
             _userRepository = userRepository;
+            _familyRepository = familyRepository;
         }
 
         public User AddUser(User user)
@@ -34,6 +36,8 @@ namespace Services
 
         public User DeleteUser(Guid id)
         {
+            User user = _userRepository.GetSingle(id);
+            _familyRepository.RemoveUserFromFamily(user);
             return _userRepository.Delete(id).Result;
         }
 

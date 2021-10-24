@@ -28,7 +28,7 @@ namespace Controllers
             TokenService = tokenService;
         }
 
-        [Function(nameof(AuthController.Login))]
+        [Function("login")]
         [OpenApiOperation(operationId: "login", tags: new[] { "auth" }, Summary = "Login for a user",
                     Description = "This method logs in the user, and retrieves a JWT bearer token.")]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Login), Required = true, Description = "The user credentials", Example = typeof(DummyLoginExample))]
