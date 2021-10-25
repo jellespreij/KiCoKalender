@@ -43,7 +43,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> AddAppointment(
-            [HttpTrigger(AuthorizationLevel.Function,
+            [HttpTrigger(AuthorizationLevel.Anonymous,
             "POST", Route = "appointment")]
             HttpRequestData req,
             FunctionContext executionContext)
@@ -88,7 +88,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> FindAppointmentByFamilyIdAndUserId(
-            [HttpTrigger(AuthorizationLevel.Function,
+            [HttpTrigger(AuthorizationLevel.Anonymous,
             "GET", Route = "appointment/{userId}")]
             HttpRequestData req,
             string userId,
@@ -123,7 +123,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> DeleteAppointment(
-            [HttpTrigger(AuthorizationLevel.Function,
+            [HttpTrigger(AuthorizationLevel.Anonymous,
             "DELETE", Route = "appointment")]
             HttpRequestData req,
             string id,
@@ -155,7 +155,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> UpdateAppointment(
-            [HttpTrigger(AuthorizationLevel.Function, "PUT", Route = "appointment")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "PUT", Route = "appointment")]
             HttpRequestData req,
             string id,
             FunctionContext executionContext)

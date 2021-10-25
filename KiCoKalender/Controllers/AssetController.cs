@@ -47,7 +47,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> AddAsset(
-            [HttpTrigger(AuthorizationLevel.Function,
+            [HttpTrigger(AuthorizationLevel.Anonymous,
             "POST", Route = "asset")]
             HttpRequestData req,
             string localUrl,
@@ -92,7 +92,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> FindAssetsByFolderId(
-            [HttpTrigger(AuthorizationLevel.Function,
+            [HttpTrigger(AuthorizationLevel.Anonymous,
             "GET", Route = "asset")]
             HttpRequestData req,
             string folderId,
@@ -126,7 +126,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> DeleteAsset(
-            [HttpTrigger(AuthorizationLevel.Function,
+            [HttpTrigger(AuthorizationLevel.Anonymous,
             "DELETE", Route = "asset")]
             HttpRequestData req,
             string id,
@@ -158,7 +158,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> UpdateAsset(
-            [HttpTrigger(AuthorizationLevel.Function, "PUT", Route = "asset")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "PUT", Route = "asset")]
             HttpRequestData req,
             string id,
             FunctionContext executionContext)

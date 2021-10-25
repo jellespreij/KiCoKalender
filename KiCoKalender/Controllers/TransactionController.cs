@@ -40,7 +40,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> AddTransaction(
-            [HttpTrigger(AuthorizationLevel.Function,
+            [HttpTrigger(AuthorizationLevel.Anonymous,
             "POST", Route = "transaction")]
             HttpRequestData req,
             string localUrl,
@@ -85,7 +85,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> FindTransactionsByFamilyId(
-            [HttpTrigger(AuthorizationLevel.Function,
+            [HttpTrigger(AuthorizationLevel.Anonymous,
             "GET", Route = "transaction")]
             HttpRequestData req,
             string familyId,
@@ -121,7 +121,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> DeleteTransaction(
-            [HttpTrigger(AuthorizationLevel.Function,
+            [HttpTrigger(AuthorizationLevel.Anonymous,
             "DELETE", Route = "transaction")]
             HttpRequestData req,
             string id,
@@ -154,7 +154,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> UpdateAsset(
-            [HttpTrigger(AuthorizationLevel.Function, "PUT", Route = "transaction")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "PUT", Route = "transaction")]
             HttpRequestData req,
             string id,
             FunctionContext executionContext)

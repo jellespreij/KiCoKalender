@@ -39,7 +39,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> AddAddress(
-            [HttpTrigger(AuthorizationLevel.Function, "POST", Route = "contact")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "contact")]
             HttpRequestData req,
             FunctionContext executionContext)
         {
@@ -81,7 +81,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> FindAddressByFamilyId(
-            [HttpTrigger(AuthorizationLevel.Function,
+            [HttpTrigger(AuthorizationLevel.Anonymous,
             "GET", Route = "contact")]
             HttpRequestData req,
             string familyId,
@@ -117,7 +117,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> DeleteAddress(
-            [HttpTrigger(AuthorizationLevel.Function,
+            [HttpTrigger(AuthorizationLevel.Anonymous,
             "DELETE", Route = "contact")]
             HttpRequestData req,
             string id,
@@ -151,7 +151,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> UpdateAddress(
-            [HttpTrigger(AuthorizationLevel.Function, "PUT", Route = "contact")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "PUT", Route = "contact")]
             HttpRequestData req,
             string id,
             FunctionContext executionContext)

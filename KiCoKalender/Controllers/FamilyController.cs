@@ -42,7 +42,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> AddFamily(
-            [HttpTrigger(AuthorizationLevel.Function,
+            [HttpTrigger(AuthorizationLevel.Anonymous,
             "POST", Route = "family/{userId}")]
             HttpRequestData req,
             string userId,
@@ -86,7 +86,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> FindFamilyByFamilyId(
-            [HttpTrigger(AuthorizationLevel.Function, "GET", Route = "family")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", Route = "family")]
             HttpRequestData req,
             string familyId,
             FunctionContext executionContext)
@@ -122,7 +122,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> InsertUserIntoFamily(
-            [HttpTrigger(AuthorizationLevel.Function, "PUT", Route = "family/add-user")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "PUT", Route = "family/add-user")]
             HttpRequestData req,
             string id,
             FunctionContext executionContext)
@@ -160,7 +160,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> InsertFolderIntoFamily(
-            [HttpTrigger(AuthorizationLevel.Function, "PUT", Route = "family/add-folder")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "PUT", Route = "family/add-folder")]
             HttpRequestData req,
             string id,
             FunctionContext executionContext)
@@ -198,7 +198,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> DeleteUser(
-           [HttpTrigger(AuthorizationLevel.Function,
+           [HttpTrigger(AuthorizationLevel.Anonymous,
             "DELETE", Route = "family")]
             HttpRequestData req,
            string id,

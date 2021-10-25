@@ -43,7 +43,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> FindUserByUserId(
-            [HttpTrigger(AuthorizationLevel.Function, "GET", Route = "user/{userId}")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", Route = "user/{userId}")]
             HttpRequestData req,
             String userId,
             FunctionContext executionContext)
@@ -80,7 +80,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> FindUserByEmail(
-            [HttpTrigger(AuthorizationLevel.Function, "GET", Route = "user/FindUser")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "GET", Route = "user/FindUser")]
             HttpRequestData req,
             string email,
             FunctionContext executionContext)
@@ -112,7 +112,7 @@ namespace Controllers
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid input", Description = "Invalid input")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Conflict, Summary = "User already exists", Description = "User already exists")]
         public async Task<HttpResponseData> addUser(
-        [HttpTrigger(AuthorizationLevel.Function, "POST",
+        [HttpTrigger(AuthorizationLevel.Anonymous, "POST",
             Route = "user")]
             HttpRequestData req,
             FunctionContext executionContext)
@@ -157,7 +157,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> DeleteUser(
-            [HttpTrigger(AuthorizationLevel.Function,
+            [HttpTrigger(AuthorizationLevel.Anonymous,
             "DELETE", Route = "user")]
             HttpRequestData req,
             string id,
@@ -190,7 +190,7 @@ namespace Controllers
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> UpdateUser(
-            [HttpTrigger(AuthorizationLevel.Function, "PUT", Route = "user")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "PUT", Route = "user")]
             HttpRequestData req,
             string id,
             FunctionContext executionContext)
