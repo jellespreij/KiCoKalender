@@ -12,7 +12,7 @@ namespace Services
         User FindUserByUserId(Guid userId);
         User AddUser(User user);
         User UpdateUser(User user, Guid id);
-        User DeleteUser(Guid id);
+        Task<User> DeleteUser(Guid id);
         User FindUserByEmail(string email);
     }
 }

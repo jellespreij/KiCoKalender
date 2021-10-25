@@ -34,11 +34,12 @@ namespace Services
             }
         }
 
-        public User DeleteUser(Guid id)
+        public Task<User> DeleteUser(Guid id)
         {
             User user = _userRepository.GetSingle(id);
             _familyRepository.RemoveUserFromFamily(user);
-            return _userRepository.Delete(id).Result;
+
+            return _userRepository.Delete(id);
         }
 
         public User FindUserByUserId(Guid userId)

@@ -42,10 +42,9 @@ namespace Models
 
         }
 
-        public Family(Guid id, List<User> users, string name)
+        public Family(Guid id, string name)
         {
             Id = id;
-            Users = users;
             Name = name;
         }
     }

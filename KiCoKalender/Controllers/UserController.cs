@@ -170,7 +170,7 @@ namespace Controllers
                 // Generate output
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-                User deletedUser = UserService.DeleteUser(Guid.Parse(id));
+                User deletedUser = UserService.DeleteUser(Guid.Parse(id)).Result;
 
                 if (deletedUser is null)
                 {

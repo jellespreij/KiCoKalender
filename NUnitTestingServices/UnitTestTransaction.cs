@@ -35,24 +35,6 @@ namespace NUnitTestingServices
         }
 
         [Test]
-        public void Calling_AddTransaction_ON_ServiceLayer_Should_Call_transactionRepository_and_Add_single_transaction()
-        {
-            //Arrange
-            string localUrl = "-url-";
-            _transactionRepositoryMock.Setup(m => m.Add(_MockLstTransactions[0]).Result).Throws(new Exception());
-
-            //act
-            Transaction result = _transactionService.AddTransaction(_MockLstTransactions[0], localUrl).Result;
-
-            //Assert
-            Assert.That(result, Is.InstanceOf(typeof(Transaction)));
-            Assert.Throws<FileNotFoundException>();
-
-            //Check that the GetAll method was called once
-            //_transactionRepositoryMock.Verify(c => c.Add(_MockLstTransactions[0]).Result, Times.Once);
-        }
-
-        [Test]
         public void Calling_FindTransactionByFamilyId_ON_ServiceLayer_Should_Call_transactionRepository_and_Return_transactions()
         {
             Guid familyId = _MockLstTransactions[0].FamilyId;

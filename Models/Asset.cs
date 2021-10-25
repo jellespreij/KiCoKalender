@@ -32,7 +32,7 @@ namespace Models
         [JsonRequired]
         public DateTime CreatedDate { get; set; }
 
-        [OpenApiProperty(Description = "Gets or sets the foreign family ID.")]
+        [OpenApiProperty(Description = "Gets or sets the foreign folder ID.")]
         public Guid? FolderId { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the family.")]
@@ -50,7 +50,7 @@ namespace Models
 
         }
 
-        public Asset(Guid id, string name, string description, DateTime createdDate, string url, bool privacy, string partitionKey)
+        public Asset(Guid id, string name, string description, DateTime createdDate, string url, string partitionKey)
         {
             Id = id;
             Name = name;

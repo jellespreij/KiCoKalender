@@ -13,15 +13,23 @@ namespace Services
     public class FamilyService : IFamilyService
     {
         private IFamilyRepository _familyRepository;
+        private IUserRepository _userRepository;
 
-        public FamilyService(IFamilyRepository familyRepository)
+        public FamilyService(IFamilyRepository familyRepository, IUserRepository userRepository)
         {
             _familyRepository = familyRepository;
+            _userRepository = userRepository;
         }
 
-        public Family AddFamily(Family family)
+        public Family AddFamily(Family family, Guid userId)
         {
-            return _familyRepository.Add(family).Result;
+            Family addedFamily = _familyRepository.Add(family).Result;
+            User userToAdd = _userRepository.GetSingle(userId);
+
+            _familyRepository.AddUserToFamily(userToAdd, family.Id);
+
+            addedFamily.Users.Add(userToAdd);
+            return addedFamily;
         }
 
         public Family DeleteFamily(Guid id)

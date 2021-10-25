@@ -28,30 +28,10 @@ namespace NUnitTestingServices
             _assetService = new AssetService(_assetRepositoryMock.Object, _folderRepositoryMock.Object, _blobService);
             _MockLstAssets = new List<Asset>();
 
-            Asset assetOne = new Asset(Guid.NewGuid(), "picture.png", "its a picture", DateTime.Now, "-url-", false, Guid.NewGuid().ToString());
+            Asset assetOne = new Asset(Guid.NewGuid(), "picture.png", "its a picture", DateTime.Now, "-url-", Guid.NewGuid().ToString());
             _MockLstAssets.Add(assetOne);
 
             _MockFolder = new Folder(Guid.NewGuid(), "images");
-        }
-
-        [Test]
-        public void Calling_AddAsset_ON_ServiceLayer_Should_Call_UserRepository_and_Add_single_Asset()
-        {
-            Guid folderId = _MockFolder.Id;
-
-            //Arrange
-            _folderRepositoryMock.Setup(m => m.GetSingle(folderId)).Returns(_MockFolder);
-            _assetRepositoryMock.Setup(m => m.Add(_MockLstAssets[0]).Result).Returns(_MockLstAssets[0]);
-            _assetRepositoryMock.Setup(m => m.AddAssetToFolder(_MockFolder, folderId).Result).Returns(_MockLstAssets[0]);
-
-            //act
-            Asset result = _assetService.AddAsset(_MockLstAssets[0], folderId, "moqtxt.txt").Result;
-
-            //Assert
-            Assert.That(result, Is.InstanceOf(typeof(Asset)));
-
-            //Check that the GetAll method was called once
-            _assetRepositoryMock.Verify(c => c.Add(_MockLstAssets[0]).Result, Times.Once);
         }
 
         [Test]
@@ -116,5 +96,11 @@ namespace NUnitTestingServices
             _assetRepositoryMock = null;
             _MockLstAssets = null;
         }
+    }
+
+    interface IFileSystem
+    {
+        bool FileExists(string fileName);
+        DateTime GetCreationDate(string fileName);
     }
 }

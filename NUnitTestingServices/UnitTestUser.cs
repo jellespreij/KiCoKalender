@@ -12,13 +12,15 @@ namespace NUnitTestingServices
     {
 
         private Mock<IUserRepository> _userRepositoryMock;
+        private Mock<IFamilyRepository> _familyRepositoryMock;
         private UserService _userService;
         private List<User> _MockLstUsers;
         [SetUp]
         public void Setup()
         {
             _userRepositoryMock = new Mock<IUserRepository>();
-            _userService = new UserService(_userRepositoryMock.Object);
+            _familyRepositoryMock = new Mock<IFamilyRepository>();
+            _userService = new UserService(_userRepositoryMock.Object, _familyRepositoryMock.Object);
             
             _MockLstUsers = new List<User>();
             User userOne = new User(Guid.NewGuid(), "Cyprus", "Cypruson", "email.email@gmail.com", "password1", Role.Child, DateTime.Now, "straat 123", "1234AB");
@@ -83,7 +85,7 @@ namespace NUnitTestingServices
             _userRepositoryMock.Setup(m => m.Delete(_MockLstUsers[0].Id).Result).Returns(_MockLstUsers[0]);
 
             //act
-            User result = _userService.DeleteUser(_MockLstUsers[0].Id);
+            User result = _userService.DeleteUser(_MockLstUsers[0].Id).Result;
 
             //Assert
             Assert.That(result, Is.InstanceOf(typeof(User)));

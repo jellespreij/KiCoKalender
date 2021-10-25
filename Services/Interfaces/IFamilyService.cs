@@ -10,7 +10,7 @@ namespace Services
     public interface IFamilyService
     {
         Family FindFamilyByFamilyId(Guid familyId);
-        Family AddFamily(Family family);
+        Family AddFamily(Family family, Guid userId);
         void AddUserToFamily(User user, Guid id);
         void AddFolderToFamily(Folder folder, Guid id);
         Family DeleteFamily(Guid id);

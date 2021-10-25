@@ -13,24 +13,24 @@ namespace NUnitTestingServices
     public class UnitTestFamily
     {
         private Mock<IFamilyRepository> _familyRepositoryMock;
+        private Mock<IUserRepository> _userRepositoryMock;
         private FamilyService _familyService;
         private List<Family> _MockLstFamily;
+        private User _MockUser;
+
         [SetUp]
         public void Setup()
         {
             _familyRepositoryMock = new Mock<IFamilyRepository>();
-            _familyService = new FamilyService(_familyRepositoryMock.Object);
+            _userRepositoryMock = new Mock<IUserRepository>();
 
-            List<User> _MockLstUsers = new List<User>();
-            User userOne = new User(Guid.NewGuid(), "Cyprus", "Cypruson", "email.email@gmail.com", "password1", Role.Child, DateTime.Now, "straat 123", "1234AB");
-            User userTwo = new User(Guid.NewGuid(), "Crete", "Alebllo", "crete@hotmail.com", "HeelGeheimwachtwoord!", Role.Parent, DateTime.Now, "de hogenveen 12", "2375HY");
+            _familyService = new FamilyService(_familyRepositoryMock.Object, _userRepositoryMock.Object);
 
-            _MockLstUsers.Add(userOne);
-            _MockLstUsers.Add(userTwo);
+            _MockUser = new User(Guid.NewGuid(), "Cyprus", "Cypruson", "email.email@gmail.com", "password1", Role.Child, DateTime.Now, "straat 123", "1234AB");
 
             _MockLstFamily = new List<Family>();
-            Family familyOne = new Family(Guid.NewGuid(), _MockLstUsers, "De barends");
-            Family familyTwo = new Family(Guid.NewGuid(), _MockLstUsers, "Jansen");
+            Family familyOne = new Family(Guid.NewGuid(), "De barends");
+            Family familyTwo = new Family(Guid.NewGuid(), "Jansen");
 
             _MockLstFamily.Add(familyOne);
             _MockLstFamily.Add(familyTwo);
@@ -41,9 +41,11 @@ namespace NUnitTestingServices
         {
             //Arrange
             _familyRepositoryMock.Setup(m => m.Add(_MockLstFamily[0]).Result).Returns(_MockLstFamily[0]);
+            _userRepositoryMock.Setup(m => m.GetSingle(_MockUser.Id)).Returns(_MockUser);
+            _familyRepositoryMock.Setup(m => m.AddUserToFamily(_MockUser, _MockLstFamily[0].Id));
 
             //act
-            Family result = _familyService.AddFamily(_MockLstFamily[0]);
+            Family result = _familyService.AddFamily(_MockLstFamily[0], _MockUser.Id);
 
             //Assert
             Assert.That(result, Is.InstanceOf(typeof(Family)));
@@ -82,22 +84,6 @@ namespace NUnitTestingServices
 
             //Check that the delete method was called once
             _familyRepositoryMock.Verify(c => c.Delete(_MockLstFamily[1].Id), Times.Once);
-        }
-
-        [Test]
-        public void Calling_UpdateFamily_ON_ServiceLayer_Should_Call_FamilyRepository_and_Return_updated_Family()
-        {
-            //Arrange
-            _familyRepositoryMock.Setup(m => m.Update(_MockLstFamily[1], _MockLstFamily[1].Id).Result).Returns(_MockLstFamily[1]);
-
-            //act
-            Family result = _familyService.UpdateFamily(_MockLstFamily[1], _MockLstFamily[1].Id);
-
-            //Assert
-            Assert.That(result, Is.InstanceOf(typeof(Family)));
-
-            //Check that the delete method was called once
-            _familyRepositoryMock.Verify(c => c.Update(_MockLstFamily[1], _MockLstFamily[1].Id), Times.Once);
         }
 
         [Test]

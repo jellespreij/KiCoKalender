@@ -34,6 +34,7 @@ namespace Controllers
         [Function("AddFamily")]
         [UserAuth]
         [OpenApiOperation(operationId: "AddFamily", tags: new[] { "family" }, Summary = "Add a family to the KiCoKalender", Description = "This adds a family to the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(Guid), Summary = "UserId of family to return", Description = "UserId of family to return", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Family), Required = true, Description = "Family that needs to be added to the KiCoKalender", Example = typeof(DummyFamilyExample))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Family), Summary = "New family added", Description = "New family added")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid input", Description = "Invalid input")]
@@ -42,8 +43,9 @@ namespace Controllers
         [ForbiddenResponse]
         public async Task<HttpResponseData> AddFamily(
             [HttpTrigger(AuthorizationLevel.Function,
-            "POST", Route = "family")]
+            "POST", Route = "family/{userId}")]
             HttpRequestData req,
+            string userId,
             FunctionContext executionContext)
         {
             return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) =>
@@ -60,7 +62,7 @@ namespace Controllers
                     }
                     else
                     {
-                        Family addedFamily = FamilyService.AddFamily(family);
+                        Family addedFamily = FamilyService.AddFamily(family, Guid.Parse(userId));
                         await response.WriteAsJsonAsync(addedFamily);
                     }
                 }
@@ -77,14 +79,14 @@ namespace Controllers
         [Function("FindFamilyByFamilyId")]
         [UserAuth]
         [OpenApiOperation(operationId: "FindFamilyByFamilyId", tags: new[] { "family" }, Summary = "Find family by familyId", Description = "Returns a family by familyId.", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiParameter(name: "familyId", In = ParameterLocation.Path, Required = true, Type = typeof(Guid), Summary = "FamilyId of family to return", Description = "FamilyId of family to return", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiParameter(name: "familyId", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "FamilyId of family to return", Description = "FamilyId of family to return", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Family), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyFamilyExample))]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid Id supplied", Description = "Invalid Id supplied")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "User not found", Description = "User not found")]
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> FindFamilyByFamilyId(
-            [HttpTrigger(AuthorizationLevel.Function, "GET", Route = "family/{familyId}")]
+            [HttpTrigger(AuthorizationLevel.Function, "GET", Route = "family")]
             HttpRequestData req,
             string familyId,
             FunctionContext executionContext)
