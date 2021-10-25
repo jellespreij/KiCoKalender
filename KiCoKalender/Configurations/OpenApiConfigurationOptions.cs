@@ -9,12 +9,11 @@ namespace KiCoKalender.Configurations {
 		public override OpenApiInfo Info { get; set; } = new OpenApiInfo() {
 			Version = "3.0.0",
 			Title = "KiCoKalender project for project cloud",
-			Description = "An example of how to set up a .NET 5 Azure Functions project with OpenAPI support.",
+			Description = "KicoKalender backend with .NET 5 Azure Functions with OpenAPI support.",
 			TermsOfService = new Uri("https://github.com/Azure/azure-functions-openapi-extension"),
 			Contact = new OpenApiContact() {
-				Name = "Erwin de Vries",
-				Email = "erwin.devries@inholland.nl",
-				//Url = new Uri("https://github.com/Azure/azure-functions-openapi-extension/issues"),
+				Name = "Kimberly van Gelder",
+				Email = "565459@student.inholland.nl",
 			},
 			License = new OpenApiLicense() {
 				Name = "MIT",

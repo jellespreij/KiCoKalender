@@ -34,9 +34,8 @@ namespace Controllers
         [UserAuth]
         [OpenApiOperation(operationId: "AddContact", tags: new[] { "contact" }, Summary = "Add an contact to the KiCoKalender", Description = "This adds a new contact to the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Contact), Required = true, Description = "Contact that needs to be added to the KiCoKalender")]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Contact), Summary = "New contact added", Description = "New contact added", Example = typeof(DummyContactExample))]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.Created, contentType: "application/json", bodyType: typeof(Contact), Summary = "New contact added", Description = "New contact added", Example = typeof(DummyContactExample))]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid input", Description = "Invalid input")]
-        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Validation exception", Description = "Validation exception")]
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> AddAddress(
@@ -46,7 +45,7 @@ namespace Controllers
         {
             return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) =>
             {
-                HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
+                HttpResponseData response = req.CreateResponse(HttpStatusCode.Created);
                 try
                 {
                     string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
@@ -101,7 +100,7 @@ namespace Controllers
                 }
                 else
                 {
-                    response = req.CreateResponse(HttpStatusCode.BadRequest);
+                    response = req.CreateResponse(HttpStatusCode.NotFound);
                 }
 
                 return response;
@@ -115,7 +114,6 @@ namespace Controllers
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Contact), Summary = "New contact Delete", Description = "Contact deleted", Example = typeof(DummyContactExample))]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid input", Description = "Invalid input")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Contact not found", Description = "Contact not found")]
-        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Validation exception", Description = "Validation exception")]
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> DeleteAddress(

@@ -53,23 +53,7 @@ namespace Models
     {
         public override IOpenApiExample<Family> Build(NamingStrategy NamingStrategy = null)
         {
-            List<User> users = new();
-
-            users.Add(
-                new User()
-                {
-                    FirstName = "Jelle",
-                    LastName = "Spreij",
-                    Password = "-pass-",
-                    Address = "straat1234",
-                    Email = "-email-",
-                    Age = DateTime.Now,
-                    Created = DateTime.Now,
-                    Postcode = "AB1234",
-                    Role = Role.Parent
-                });
-
-            Examples.Add(OpenApiExampleResolver.Resolve("Family", "This is a family summary", new Family() { Users = users, Name = "family name" }, NamingStrategy));
+            Examples.Add(OpenApiExampleResolver.Resolve("Family", "This is a family summary", new Family() { Name = "family name" }, NamingStrategy));
 
             return this;
         }

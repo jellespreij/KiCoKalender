@@ -42,7 +42,7 @@ namespace Controllers
         [OpenApiParameter(name: "localUrl", In = ParameterLocation.Query, Required = true, Type = typeof(string), Summary = "Url of image", Description = "Url of image", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiParameter(name: "folderId", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "FolderId of Assets to return", Description = "FolderId of Assets to return", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be added to the KiCoKalender", Example = typeof(DummyAssetExample))]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "New asset added", Description = "New asset added")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.Created, contentType: "application/json", bodyType: typeof(Asset), Summary = "New asset added", Description = "New asset added")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid input", Description = "Invalid input")]
         [UnauthorizedResponse]
         [ForbiddenResponse]
@@ -56,7 +56,7 @@ namespace Controllers
         {
             return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) =>
             {
-                HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
+                HttpResponseData response = req.CreateResponse(HttpStatusCode.Created);
                 try
                 {
                     string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
@@ -84,8 +84,8 @@ namespace Controllers
 
         [Function("FindAssetsByFolderId")]
         [UserAuth]
-        [OpenApiOperation(operationId: "FindAssetsByFolderId", tags: new[] { "asset" }, Summary = "Find assets by familyId and folder", Description = "Returns assets by familyId and folder.", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiParameter(name: "folderId", In = ParameterLocation.Path, Required = true, Type = typeof(Guid), Summary = "FolderId of Assets to return", Description = "FolderId of Assets to return", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiOperation(operationId: "FindAssetsByFolderId", tags: new[] { "asset" }, Summary = "Find assets by folder", Description = "Returns assets by familyId and folder.", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiParameter(name: "folderId", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "FolderId of Assets to return", Description = "FolderId of Assets to return", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(IEnumerable<Asset>), Summary = "successful operation", Description = "successful operation", Example = typeof(DummyAssetExample))]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Assets not found", Description = "Assets not found")]
@@ -93,7 +93,7 @@ namespace Controllers
         [ForbiddenResponse]
         public async Task<HttpResponseData> FindAssetsByFolderId(
             [HttpTrigger(AuthorizationLevel.Function,
-            "GET", Route = "asset/{folderId}")]
+            "GET", Route = "asset")]
             HttpRequestData req,
             string folderId,
             FunctionContext executionContext)
@@ -119,8 +119,8 @@ namespace Controllers
         [Function("DeleteAsset")]
         [UserAuth]
         [OpenApiOperation(operationId: "DeleteAsset", tags: new[] { "asset" }, Summary = "Deletes an asset from the KiCoKalender", Description = "This Deletes an asset from the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiParameter(name: "id", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "Id of Assets to return", Description = "Id of Assets to return", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(User), Summary = "Asset Deleted", Description = "Asset deleted")]
+        [OpenApiParameter(name: "id", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "Id of Assets to delete", Description = "Id of Assets to delete", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "Asset Deleted", Description = "Asset deleted")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid input", Description = "Invalid input")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Asset not found", Description = "Asset not found")]
         [UnauthorizedResponse]

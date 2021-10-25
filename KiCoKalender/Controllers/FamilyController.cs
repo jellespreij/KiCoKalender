@@ -34,9 +34,9 @@ namespace Controllers
         [Function("AddFamily")]
         [UserAuth]
         [OpenApiOperation(operationId: "AddFamily", tags: new[] { "family" }, Summary = "Add a family to the KiCoKalender", Description = "This adds a family to the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(Guid), Summary = "UserId of family to return", Description = "UserId of family to return", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(Guid), Summary = "UserId of user to add to the KiCoKalender", Description = "UserId of user to add to the KiCoKalender", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Family), Required = true, Description = "Family that needs to be added to the KiCoKalender", Example = typeof(DummyFamilyExample))]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Family), Summary = "New family added", Description = "New family added")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.Created, contentType: "application/json", bodyType: typeof(Family), Summary = "New family added", Description = "New family added")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid input", Description = "Invalid input")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Conflict, Summary = "Family already exists", Description = "Family already exists")]
         [UnauthorizedResponse]
@@ -50,7 +50,7 @@ namespace Controllers
         {
             return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) =>
             {
-                HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
+                HttpResponseData response = req.CreateResponse(HttpStatusCode.Created);
                 try
                 {
                     string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
@@ -119,7 +119,6 @@ namespace Controllers
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(User), Summary = "Family details updated", Description = "Family details updated", Example = typeof(DummyFamilyExample))]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Family not found", Description = "Family not found")]
-        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Validation exception", Description = "Validation exception")]
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> InsertUserIntoFamily(
@@ -154,11 +153,10 @@ namespace Controllers
         [UserAuth]
         [OpenApiOperation(operationId: "InsertFolderIntoFamily", tags: new[] { "family" }, Summary = "Update an existing family", Description = "This updates an existing family.", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiParameter(name: "id", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "Id of family to update", Description = "Id of family to update", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Folder), Required = true, Description = "Family that needs to be updated")]
+        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Folder), Required = true, Description = "Folder taht needs to be added to the family")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Folder), Summary = "Family details updated", Description = "Family details updated", Example = typeof(DummyFamilyExample))]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Family not found", Description = "Family not found")]
-        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Validation exception", Description = "Validation exception")]
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> InsertFolderIntoFamily(

@@ -28,7 +28,7 @@ namespace Repositories
             Commit();
         }
 
-        public async void AddUserToFamily(User user, Guid id)
+        public async Task<Family> AddUserToFamily(User user, Guid id)
         {
             await _context.Database.EnsureCreatedAsync();
 
@@ -36,6 +36,8 @@ namespace Repositories
             familyToUpdate.Users.Add(user);
 
             Commit();
+
+            return familyToUpdate;
         }
 
         public async void RemoveUserFromFamily(User user)

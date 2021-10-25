@@ -54,10 +54,9 @@ namespace Services
         public async Task<Asset> DeleteAsset(Guid id)
         {
             Asset asset = _assetRepository.GetSingle(id);
-
             CloudBlobContainer container = await _blobService.GetBlobContainer();
 
-            var blob = container.GetBlobReference(asset.Folder.Name + "/" + asset.Name); 
+             var blob = container.GetBlobReference(asset.Folder.Name + "/" + asset.Name); 
             await blob.DeleteIfExistsAsync();
 
             _folderRepository.RemoveAssetFromFolder(asset);

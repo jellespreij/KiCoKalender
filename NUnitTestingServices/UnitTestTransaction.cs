@@ -33,7 +33,6 @@ namespace NUnitTestingServices
             _MockLstTransactions.Add(transactionOne);
             _MockLstTransactions.Add(transactionTwo);
         }
-
         [Test]
         public void Calling_FindTransactionByFamilyId_ON_ServiceLayer_Should_Call_transactionRepository_and_Return_transactions()
         {

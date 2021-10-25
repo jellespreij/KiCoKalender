@@ -26,9 +26,9 @@ namespace Services
             Family addedFamily = _familyRepository.Add(family).Result;
             User userToAdd = _userRepository.GetSingle(userId);
 
-            _familyRepository.AddUserToFamily(userToAdd, family.Id);
+            addedFamily = _familyRepository.AddUserToFamily(userToAdd, family.Id).Result;
 
-            addedFamily.Users.Add(userToAdd);
+            //addedFamily.Users.Add(userToAdd);
             return addedFamily;
         }
 

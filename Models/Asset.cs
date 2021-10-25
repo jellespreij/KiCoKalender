@@ -35,7 +35,7 @@ namespace Models
         [OpenApiProperty(Description = "Gets or sets the foreign folder ID.")]
         public Guid? FolderId { get; set; }
 
-        [OpenApiProperty(Description = "Gets or sets the family.")]
+        [OpenApiProperty(Description = "Gets or sets the folder.")]
         [JsonIgnore]
         public Folder Folder { get; set; }
 

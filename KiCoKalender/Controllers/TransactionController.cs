@@ -37,7 +37,6 @@ namespace Controllers
         [OpenApiParameter(name: "localUrl", In = ParameterLocation.Query, Required = true, Type = typeof(string), Summary = "Url of image", Description = "Url of image", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Transaction), Required = true, Description = "Transaction object that needs to be added to the KiCoKalender", Example = typeof(DummyTransactionExample))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Transaction), Summary = "New transaction added", Description = "New transaction added")]
-        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Invalid input", Description = "Invalid input")]
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> AddTransaction(
