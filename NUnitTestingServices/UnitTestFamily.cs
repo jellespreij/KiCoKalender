@@ -42,7 +42,7 @@ namespace NUnitTestingServices
             //Arrange
             _familyRepositoryMock.Setup(m => m.Add(_MockLstFamily[0]).Result).Returns(_MockLstFamily[0]);
             _userRepositoryMock.Setup(m => m.GetSingle(_MockUser.Id)).Returns(_MockUser);
-            _familyRepositoryMock.Setup(m => m.AddUserToFamily(_MockUser, _MockLstFamily[0].Id));
+            _familyRepositoryMock.Setup(m => m.AddUserToFamily(_MockUser, _MockLstFamily[0].Id).Result).Returns(_MockLstFamily[0]);
 
             //act
             Family result = _familyService.AddFamily(_MockLstFamily[0], _MockUser.Id);

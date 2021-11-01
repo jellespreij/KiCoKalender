@@ -66,7 +66,7 @@ namespace Controllers
                         await response.WriteAsJsonAsync(addedFamily);
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Logger.LogError("Invalid input", ex);
                     response = req.CreateResponse(HttpStatusCode.BadRequest);
@@ -129,20 +129,29 @@ namespace Controllers
         {
             return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) =>
             {
-                // Parse input
-                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                User user = JsonConvert.DeserializeObject<User>(requestBody);
 
-                // Generate output
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-                if (user is null)
+                try
                 {
-                    response = req.CreateResponse(HttpStatusCode.BadRequest);
+                    // Parse input
+                    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                    User user = JsonConvert.DeserializeObject<User>(requestBody);
+                    // Generate output
+
+                    if (user is null)
+                    {
+                        response = req.CreateResponse(HttpStatusCode.BadRequest);
+                    }
+                    else
+                    {
+                        FamilyService.AddUserToFamily(user, Guid.Parse(id));
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    FamilyService.AddUserToFamily(user, Guid.Parse(id));
+                    Logger.LogError("Invalid input", ex);
+                    response = req.CreateResponse(HttpStatusCode.BadRequest);
                 }
 
                 return response;
@@ -211,10 +220,10 @@ namespace Controllers
 
                 Family deletedFamily = FamilyService.DeleteFamily(Guid.Parse(id));
 
-                if (deletedFamily is null) 
+                if (deletedFamily is null)
                 {
                     response = req.CreateResponse(HttpStatusCode.NotFound);
-                } 
+                }
 
                 return response;
             });

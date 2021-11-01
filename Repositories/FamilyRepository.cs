@@ -32,7 +32,7 @@ namespace Repositories
         {
             await _context.Database.EnsureCreatedAsync();
 
-            var familyToUpdate = _context.Set<Family>().Where(entity => entity.Id == id).FirstOrDefault();
+            Family familyToUpdate = _context.Set<Family>().Where(entity => entity.Id == id).FirstOrDefault();
             familyToUpdate.Users.Add(user);
 
             Commit();

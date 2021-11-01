@@ -21,15 +21,14 @@ namespace Services
             _userRepository = userRepository;
         }
 
-        public Family AddFamily(Family family, Guid userId)
+        public void AddUserToFamily(User user, Guid id)
         {
-            Family addedFamily = _familyRepository.Add(family).Result;
-            User userToAdd = _userRepository.GetSingle(userId);
+            _familyRepository.AddUserToFamily(user, id);
+        }
 
-            addedFamily = _familyRepository.AddUserToFamily(userToAdd, family.Id).Result;
-
-            //addedFamily.Users.Add(userToAdd);
-            return addedFamily;
+        public void AddFolderToFamily(Folder folder, Guid id)
+        {
+            _familyRepository.AddFolderToFamily(folder, id);
         }
 
         public Family DeleteFamily(Guid id)
@@ -40,6 +39,17 @@ namespace Services
         public Family FindFamilyByFamilyId(Guid familyId)
         {
             return _familyRepository.GetSingle(familyId);
+        }
+
+        public Family AddFamily(Family family, Guid userId)
+        {
+            Family addedFamily = _familyRepository.Add(family).Result;
+            User userToAdd = _userRepository.GetSingle(userId);
+
+            addedFamily = _familyRepository.AddUserToFamily(userToAdd, family.Id).Result;
+
+            //addedFamily.Users.Add(userToAdd);
+            return addedFamily;
         }
 
         public async void SendMail(string toEmail)
@@ -55,16 +65,6 @@ namespace Services
             var htmlContent = "<h3>Beste Ontvanger ..</h3><p>Ik zou graag willen dat je de KiCoKalender download zodat wij beter kunnen communiceren tijdens de scheiding.</p></n><p>Vriendelijke groet, "+ from.Email+"</p>";
             var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
             await client.SendEmailAsync(msg);
-        }
-
-        public void AddUserToFamily(User user, Guid id)
-        {
-            _familyRepository.AddUserToFamily(user, id);
-        }
-        
-        public void AddFolderToFamily(Folder folder, Guid id)
-        {
-            _familyRepository.AddFolderToFamily(folder, id);
         }
     }
 }

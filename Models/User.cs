@@ -27,7 +27,6 @@ namespace Models
         public Family Family { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the email.")]
-        
         [JsonRequired]
         public string Email { get; set; }
 
@@ -60,7 +59,6 @@ namespace Models
         public string Postcode { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets created date.")]
-        [JsonRequired]
         public DateTime Created { get; set; }
 
         public User()
