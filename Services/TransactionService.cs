@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Storage;
+﻿using HttpMultipartParser;
+using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Models;
 using Repositories;
@@ -21,16 +22,14 @@ namespace Services
             _blobService = blobService;
         }
 
-        public async Task<Transaction> AddTransaction(Transaction transaction, string localUrl)
+        public async Task<Transaction> AddTransaction(FilePart file, Transaction transaction)
         {
             CloudBlobContainer container = await _blobService.GetBlobContainer();
-
-            string[] urlParts = localUrl.Split("\\", System.StringSplitOptions.RemoveEmptyEntries);
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference("transactions/" + urlParts.Last());
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference("transactions/" + file.FileName);
 
             try
             {
-                using (var filestream = System.IO.File.OpenRead(@localUrl))
+                using (var filestream = file.Data)
                 {
                     blockBlob.UploadFromStream(filestream);
                 }
@@ -39,9 +38,9 @@ namespace Services
             {
                 Console.WriteLine(ex.Message);
             }
-
+             
+            transaction.FileName = file.FileName;
             transaction.Url = blockBlob.Uri.ToString();
-            transaction.Name = urlParts.Last();
 
             return _transactionRepository.Add(transaction).Result;
         }
@@ -52,10 +51,10 @@ namespace Services
 
             CloudBlobContainer container = await _blobService.GetBlobContainer();
 
-            var blob = container.GetBlobReference("transactions/" + transaction.Name);
+            var blob = container.GetBlobReference("transactions/" + transaction.FileName);
             await blob.DeleteIfExistsAsync();
 
-            return _transactionRepository.Delete(id).Result;
+            return _transactionRepository.Delete(id).Result; 
         }
 
         public IEnumerable<Transaction> FindTransactionByFamilyId(Guid familyId)

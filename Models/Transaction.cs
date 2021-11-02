@@ -30,6 +30,10 @@ namespace Models
         [OpenApiProperty(Description = "Gets or sets the transaction name.")]
         [JsonRequired]
         public string Name { get; set; }
+        
+        [OpenApiProperty(Description = "Gets or sets the file name.")]
+        [JsonRequired]
+        public string FileName { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets the transaction description.")]
         public string Description { get; set; }
@@ -53,12 +57,13 @@ namespace Models
 
         }
 
-        public Transaction(Guid id, Guid userId, Guid familyId, string name, string url, double amount, string description, DateTime date, string partitionKey)
+        public Transaction(Guid id, Guid userId, Guid familyId, string name, string fileName, string url, double amount, string description, DateTime date, string partitionKey)
         {
             Id = id;
             UserId = userId;
             FamilyId = familyId;
             Name = name;
+            FileName = fileName;
             Amount = amount;
             Description = description;
             Date = date;

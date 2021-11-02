@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Http;
 using Auth.Interfaces;
 using System.Security.Claims;
 using Attributes;
+using HttpMultipartParser;
+using System.Linq;
 
 namespace Controllers
 {
@@ -34,16 +36,18 @@ namespace Controllers
         [Function("AddTransaction")]
         [UserAuth]
         [OpenApiOperation(operationId: "AddTransaction", tags: new[] { "transaction" }, Summary = "Add a transaction to the KiCoKalender", Description = "This adds a transaction to the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiParameter(name: "localUrl", In = ParameterLocation.Query, Required = true, Type = typeof(string), Summary = "Url of image", Description = "Url of image", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Transaction), Required = true, Description = "Transaction object that needs to be added to the KiCoKalender", Example = typeof(DummyTransactionExample))]
+        [OpenApiParameter(name: "familyId", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "FamilyId of transaction", Description = "FamilyId of transaction", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiParameter(name: "userId", In = ParameterLocation.Path, Required = true, Type = typeof(Guid), Summary = "UserId of transaction", Description = "UserId of transaction", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiRequestBody(contentType: "multipart/form-data", bodyType: typeof(IFormFile), Required = true, Description = "Transaction object that needs to be added to the KiCoKalender")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Transaction), Summary = "New transaction added", Description = "New transaction added")]
         [UnauthorizedResponse]
         [ForbiddenResponse]
         public async Task<HttpResponseData> AddTransaction(
             [HttpTrigger(AuthorizationLevel.Anonymous,
-            "POST", Route = "transaction")]
+            "POST", Route = "transaction/{userId}")]
             HttpRequestData req,
-            string localUrl,
+            string familyId,
+            string userId,
             FunctionContext executionContext)
         {
             return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) =>
@@ -51,17 +55,27 @@ namespace Controllers
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
                 try
                 {
+                    var parsedFile = MultipartFormDataParser.ParseAsync(req.Body);
+                    double amount = Double.Parse(parsedFile.Result.Parameters[0].Data);
+                    string name = parsedFile.Result.Parameters[1].Data;
 
-                    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                    Transaction transaction = JsonConvert.DeserializeObject<Transaction>(requestBody);
-
-                    if (transaction is null)
+                    if (parsedFile is null)
                     {
                         response = req.CreateResponse(HttpStatusCode.BadRequest);
                     }
                     else
                     {
-                        Transaction addedTransaction = TransactionService.AddTransaction(transaction, localUrl).Result;
+                        Transaction transaction = new()
+                        {
+                            Amount = amount,
+                            Name = name,
+                            UserId = Guid.Parse(userId),
+                            FamilyId = Guid.Parse(familyId),
+                            PartitionKey = familyId.ToString(),
+                        };
+
+
+                        Transaction addedTransaction = TransactionService.AddTransaction(parsedFile.Result.Files.First(), transaction).Result;
                         await response.WriteAsJsonAsync(addedTransaction);
                     }
 

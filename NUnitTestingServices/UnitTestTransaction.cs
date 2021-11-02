@@ -27,8 +27,8 @@ namespace NUnitTestingServices
             _transactionService = new TransactionService(_transactionRepositoryMock.Object, _blobService);
 
             _MockLstTransactions = new List<Transaction>();
-            Transaction transactionOne = new Transaction(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Kadootjes", "http://127.0.0.1:10000/devstoreaccount1/powerpuffgirls/Mojojojo.png", 12.45, "was iemand jarig", DateTime.Now, Guid.NewGuid().ToString());
-            Transaction transactionTwo = new Transaction(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "school", "http://127.0.0.1:10000/devstoreaccount1/powerpuffgirls/Mojojojo.png", 12.45, "niewe boeken", DateTime.Now, Guid.NewGuid().ToString());
+            Transaction transactionOne = new Transaction(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Kadootjes", "file1.txt", "http://127.0.0.1:10000/devstoreaccount1/powerpuffgirls/Mojojojo.png", 12.45, "was iemand jarig", DateTime.Now, Guid.NewGuid().ToString());
+            Transaction transactionTwo = new Transaction(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "school", "file2.txt", "http://127.0.0.1:10000/devstoreaccount1/powerpuffgirls/Mojojojo.png", 12.45, "niewe boeken", DateTime.Now, Guid.NewGuid().ToString());
             
             _MockLstTransactions.Add(transactionOne);
             _MockLstTransactions.Add(transactionTwo);
