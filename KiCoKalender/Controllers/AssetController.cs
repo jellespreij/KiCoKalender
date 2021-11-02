@@ -21,6 +21,7 @@ using Microsoft.Azure.Storage.Blob;
 using static System.Net.Mime.MediaTypeNames;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using HttpMultipartParser;
 
 namespace Controllers
 {
@@ -39,10 +40,9 @@ namespace Controllers
         [Function("AddAsset")]
         [UserAuth]
         [OpenApiOperation(operationId: "AddAsset", tags: new[] { "asset" }, Summary = "Add an asset to the KiCoKalender", Description = "This adds an asset to the KiCoKalender.", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiParameter(name: "localUrl", In = ParameterLocation.Query, Required = true, Type = typeof(string), Summary = "Url of image", Description = "Url of image", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiParameter(name: "folderId", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "FolderId of Assets to return", Description = "FolderId of Assets to return", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be added to the KiCoKalender", Example = typeof(DummyAssetExample))]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.Created, contentType: "application/json", bodyType: typeof(Asset), Summary = "New asset added", Description = "New asset added")]
+        [OpenApiRequestBody(contentType: "multipart/form-data", bodyType: typeof(IFormFile), Required = true, Description = "Asset object that needs to be added to the KiCoKalender")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.Created, contentType: "application/json", bodyType: typeof(Asset), Summary = "New asset added", Description = "New asset added", Example = typeof(DummyAssetExample))]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid input", Description = "Invalid input")]
         [UnauthorizedResponse]
         [ForbiddenResponse]
@@ -50,7 +50,6 @@ namespace Controllers
             [HttpTrigger(AuthorizationLevel.Anonymous,
             "POST", Route = "asset")]
             HttpRequestData req,
-            string localUrl,
             string folderId,
             FunctionContext executionContext)
         {
@@ -59,16 +58,15 @@ namespace Controllers
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.Created);
                 try
                 {
-                    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                    Asset asset = JsonConvert.DeserializeObject<Asset>(requestBody);
+                    var parsedFile = MultipartFormDataParser.ParseAsync(req.Body);                  
 
-                    if (asset is null)
+                    if (parsedFile is null)
                     {
                         response = req.CreateResponse(HttpStatusCode.BadRequest);
                     }
                     else
                     {
-                        Asset addedAsset = AssetService.AddAsset(asset, Guid.Parse(folderId), localUrl).Result;
+                        Asset addedAsset = AssetService.AddAsset(parsedFile.Result.Files.First(), Guid.Parse(folderId)).Result;
                         await response.WriteAsJsonAsync(addedAsset);
                     }
                 }

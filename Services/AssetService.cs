@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Storage;
+﻿using HttpMultipartParser;
+using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Models;
 using Repositories;
@@ -23,18 +24,16 @@ namespace Services
             _blobService = blobService;
         }
 
-        public async Task<Asset> AddAsset(Asset asset, Guid folderId, string localUrl)
+        public async Task<Asset> AddAsset(FilePart file, Guid folderId)
         {
             Folder folder = _folderRepository.GetSingle(folderId);
 
             CloudBlobContainer container = await _blobService.GetBlobContainer();
-
-            string[] urlParts = localUrl.Split("\\", System.StringSplitOptions.RemoveEmptyEntries);
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference(folder.Name + "/" + urlParts.Last());
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(folder.Name + "/" + file.FileName);
 
             try
             {
-                using (var filestream = System.IO.File.OpenRead(@localUrl))
+                using (var filestream = file.Data)
                 {
                     blockBlob.UploadFromStream(filestream);
                 }
@@ -44,8 +43,12 @@ namespace Services
                 Console.WriteLine(ex.Message);
             }
 
-            asset.Url = blockBlob.Uri.ToString();
-            asset.Name = urlParts.Last();
+            Asset asset = new()
+            {
+                Name = file.FileName,
+                Url = blockBlob.Uri.ToString(),
+                PartitionKey = folder.PartitionKey
+            };
 
             Asset addedAsset = await _assetRepository.Add(asset);
             return _assetRepository.AddAssetToFolder(folder, addedAsset.Id).Result;
@@ -56,7 +59,7 @@ namespace Services
             Asset asset = _assetRepository.GetSingle(id);
             CloudBlobContainer container = await _blobService.GetBlobContainer();
 
-             var blob = container.GetBlobReference(asset.Folder.Name + "/" + asset.Name); 
+            var blob = container.GetBlobReference(asset.Folder.Name + "/" + asset.Name);
             await blob.DeleteIfExistsAsync();
 
             _folderRepository.RemoveAssetFromFolder(asset);
