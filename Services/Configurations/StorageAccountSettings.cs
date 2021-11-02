@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Storage;
+using System;
 
 namespace Services
 {
@@ -6,8 +7,8 @@ namespace Services
     {
         public static CloudStorageAccount CreateStorageAccountFromConnectionString()
         {
-            CloudStorageAccount storageAccount;
-            storageAccount = CloudStorageAccount.Parse("UseDevelopmentStorage=true");
+            string storageConnectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
 
             return storageAccount;
         }

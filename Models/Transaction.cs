@@ -85,6 +85,8 @@ namespace Models
                         UserId = guidUser,
                         FamilyId = guidFamily,
                         Name = "name",
+                        FileName = "fileName",
+                        Amount = 45.50,
                         Date = new DateTime(2000, 10, 10),
                         PartitionKey = guidFamily.ToString()
                     },
