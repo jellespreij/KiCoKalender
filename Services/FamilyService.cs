@@ -54,8 +54,8 @@ namespace Services
 
         public async void SendMail(string toEmail)
         {
-            var apiKey = Environment.GetEnvironmentVariable("sendGridKey");
-            var client = new SendGridClient(apiKey);
+            var apikey = "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";
+            var client = new SendGridClient(apikey);
             var from = new EmailAddress("kimvangelder@kpnmail.nl");
             var subject = "Uitnodiging KiCoKalender";
             var to = new EmailAddress(toEmail);
