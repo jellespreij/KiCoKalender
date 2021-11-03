@@ -36,8 +36,6 @@ namespace Repositories.Context
             modelBuilder.Entity<User>()
                 .HasNoDiscriminator();
 
-            modelBuilder.Entity<User>()
-                .UseETagConcurrency();
 
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
@@ -52,9 +50,6 @@ namespace Repositories.Context
             modelBuilder.Entity<Appointment>()
                 .HasPartitionKey(ap => ap.PartitionKey);
 
-            modelBuilder.Entity<Appointment>()
-                .UseETagConcurrency();
-
             modelBuilder.Entity<Asset>()
                 .ToContainer("assets");
 
@@ -64,9 +59,6 @@ namespace Repositories.Context
             modelBuilder.Entity<Asset>()
                 .HasPartitionKey(a => a.PartitionKey);
 
-            modelBuilder.Entity<Asset>()
-                .UseETagConcurrency();
-
             modelBuilder.Entity<Family>()
                 .ToContainer("families");
 
@@ -75,9 +67,6 @@ namespace Repositories.Context
 
             modelBuilder.Entity<Family>()
                 .HasPartitionKey(f => f.PartitionKey);
-
-            modelBuilder.Entity<Family>()
-                .UseETagConcurrency();
 
             modelBuilder.Entity<Family>()
                .HasMany(f => f.Users)
@@ -98,9 +87,6 @@ namespace Repositories.Context
             modelBuilder.Entity<Contact>()
                 .HasPartitionKey(c => c.PartitionKey);
 
-            modelBuilder.Entity<Contact>()
-                .UseETagConcurrency();
-
             modelBuilder.Entity<Transaction>()
                 .ToContainer("transactions");
 
@@ -110,9 +96,6 @@ namespace Repositories.Context
             modelBuilder.Entity<Transaction>()
                 .HasPartitionKey(t => t.PartitionKey);
 
-            modelBuilder.Entity<Transaction>()
-                .UseETagConcurrency();
-
             modelBuilder.Entity<Folder>()
                .ToContainer("folders");
 
@@ -121,9 +104,6 @@ namespace Repositories.Context
 
             modelBuilder.Entity<Folder>()
                 .HasPartitionKey(f => f.PartitionKey);
-
-            modelBuilder.Entity<Folder>()
-                .UseETagConcurrency();
 
             modelBuilder.Entity<Folder>()
               .HasMany(fo => fo.Assets)
