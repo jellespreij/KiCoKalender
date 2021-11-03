@@ -1,6 +1,7 @@
-﻿using Context;
-using Microsoft.Azure.Cosmos;
+﻿using Microsoft.Azure.Cosmos;
 using Models;
+using Repositories.Context;
+using Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

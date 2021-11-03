@@ -11,6 +11,8 @@ using Microsoft.Extensions.Logging;
 using Repositories;
 using BCryptNet = BCrypt.Net.BCrypt;
 using Microsoft.AspNetCore.Mvc;
+using Services.Interfaces;
+using Repositories.Interfaces;
 
 namespace Services
 {

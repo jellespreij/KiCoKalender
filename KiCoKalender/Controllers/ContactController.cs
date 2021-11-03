@@ -13,12 +13,13 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using Auth.Interfaces;
 using System.Security.Claims;
-using Attributes;
+using Auth.Attributes;
 using System;
+using Services.Interfaces;
 
-namespace Controllers
+namespace KiCoKalender.Controllers
 {
-    class ContactController
+    public class ContactController
     {
         public ILogger Logger { get; }
         IContactService ContactService { get; }

@@ -16,12 +16,13 @@ using System.IO;
 using Newtonsoft.Json;
 using Auth.Interfaces;
 using System.Security.Claims;
-using Attributes;
+using Auth.Attributes;
 using Microsoft.Azure.Cosmos;
+using Services.Interfaces;
 
-namespace Controllers
+namespace KiCoKalender.Controllers
 {
-    class AppointmentController
+    public class AppointmentController
     {
         ILogger Logger { get; }
         IAppointmentService AppointmentService { get; }

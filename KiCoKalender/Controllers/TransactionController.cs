@@ -15,13 +15,14 @@ using System;
 using Microsoft.AspNetCore.Http;
 using Auth.Interfaces;
 using System.Security.Claims;
-using Attributes;
+using Auth.Attributes;
 using HttpMultipartParser;
 using System.Linq;
+using Services.Interfaces;
 
-namespace Controllers
+namespace KiCoKalender.Controllers
 {
-    class TransactionController
+    public class TransactionController
     {
         ILogger Logger { get; }
         ITransactionService TransactionService { get; }

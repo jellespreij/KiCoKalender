@@ -9,7 +9,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi.Models;
 
-namespace Attributes {
+namespace Auth.Attributes
+{
 	public class UnauthorizedResponseAttribute : OpenApiResponseWithBodyAttribute {
 		public UnauthorizedResponseAttribute() : base(HttpStatusCode.Unauthorized, "text/plain", typeof(string)) {
 			this.Description = "User login is invalid.";

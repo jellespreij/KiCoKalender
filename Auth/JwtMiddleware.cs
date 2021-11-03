@@ -3,6 +3,7 @@ using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Services;
+using Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Net.Http.Headers;

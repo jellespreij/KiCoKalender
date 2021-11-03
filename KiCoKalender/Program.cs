@@ -1,8 +1,7 @@
 using Auth;
 using Auth.Interfaces;
-using Context;
-using Controllers;
 using KiCoKalender.Configurations;
+using KiCoKalender.Controllers;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Extensions.OpenApi;
 using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Extensions;
@@ -10,7 +9,10 @@ using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Functions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Repositories;
+using Repositories.Context;
+using Repositories.Interfaces;
 using Services;
+using Services.Interfaces;
 using System.IO;
 
 namespace KiCoKalender

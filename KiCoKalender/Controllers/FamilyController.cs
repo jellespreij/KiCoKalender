@@ -14,11 +14,12 @@ using System.Collections.Generic;
 using System;
 using Auth.Interfaces;
 using System.Security.Claims;
-using Attributes;
+using Auth.Attributes;
+using Services.Interfaces;
 
-namespace Controllers
+namespace KiCoKalender.Controllers
 {
-    class FamilyController
+    public class FamilyController
     {
         ILogger Logger { get; }
         IFamilyService FamilyService { get; }

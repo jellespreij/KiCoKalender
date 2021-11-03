@@ -9,6 +9,7 @@ using NUnit.Framework;
 using System.Linq;
 using System.Linq.Expressions;
 using System.IO;
+using Repositories.Interfaces;
 
 namespace NUnitTestingServices
 {

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
 using System.Linq;
+using Repositories.Interfaces;
 
 namespace NUnitTestingServices
 {

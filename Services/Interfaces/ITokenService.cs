@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Services
+namespace Services.Interfaces
 {
 	public interface ITokenService
 	{

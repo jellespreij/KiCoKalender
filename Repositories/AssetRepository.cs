@@ -1,5 +1,6 @@
-﻿using Context;
-using Models;
+﻿using Models;
+using Repositories.Context;
+using Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

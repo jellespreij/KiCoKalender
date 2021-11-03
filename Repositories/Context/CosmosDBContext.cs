@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Context
+namespace Repositories.Context
 {
     public class CosmosDBContext : DbContext
     {

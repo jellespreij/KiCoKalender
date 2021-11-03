@@ -9,7 +9,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi.Models;
 
-namespace Attributes {
+namespace Auth.Attributes
+{
 	public class UserAuthAttribute : OpenApiSecurityAttribute {
 		public UserAuthAttribute() : base("UserAuth", SecuritySchemeType.Http) {
 			Description = "JWT for authorization";

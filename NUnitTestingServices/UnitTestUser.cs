@@ -5,6 +5,7 @@ using Services;
 using System;
 using System.Collections.Generic;
 using Moq;
+using Repositories.Interfaces;
 
 namespace NUnitTestingServices
 {

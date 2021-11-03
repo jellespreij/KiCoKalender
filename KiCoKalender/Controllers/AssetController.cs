@@ -15,17 +15,18 @@ using System;
 using Microsoft.AspNetCore.Http;
 using Auth.Interfaces;
 using System.Security.Claims;
-using Attributes;
+using Auth.Attributes;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using static System.Net.Mime.MediaTypeNames;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using HttpMultipartParser;
+using Services.Interfaces;
 
-namespace Controllers
+namespace KiCoKalender.Controllers
 {
-    class AssetController
+    public class AssetController
     {
         ILogger Logger { get; }
         IAssetService AssetService { get; }

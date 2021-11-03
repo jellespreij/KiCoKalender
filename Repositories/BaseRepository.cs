@@ -1,9 +1,11 @@
-﻿using Context;
-using Microsoft.Azure.Cosmos;
+﻿using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using Models;
+using Models.Interfaces;
+using Repositories.Context;
+using Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

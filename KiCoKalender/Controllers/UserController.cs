@@ -11,14 +11,15 @@ using System.Linq;
 using Services;
 using System.IO;
 using Newtonsoft.Json;
-using Attributes;
+using Auth.Attributes;
 using System.Security.Claims;
 using Auth;
 using Auth.Interfaces;
 using System;
 using System.Collections.Generic;
+using Services.Interfaces;
 
-namespace Controllers
+namespace KiCoKalender.Controllers
 {
     public class UserController
     {

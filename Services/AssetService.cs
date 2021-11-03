@@ -3,6 +3,8 @@ using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Models;
 using Repositories;
+using Repositories.Interfaces;
+using Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
