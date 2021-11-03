@@ -54,27 +54,6 @@ namespace NUnitTestingServices
         }
 
         [Test]
-        public void Calling_DeleteAssetByUserId_ON_ServiceLayer_Should_Call_UserRepository_and_Return_deleted_Asset()
-        {
-            Guid id = _MockLstAssets[0].Id;
-            Asset asset = _MockLstAssets[0];
-            asset.Folder = _MockFolder;
-
-            //Arrange
-            _assetRepositoryMock.Setup(m => m.GetSingle(id)).Returns(asset);
-            _assetRepositoryMock.Setup(m => m.Delete(id).Result).Returns(asset);
-
-            //act
-            Asset result = _assetService.DeleteAsset(id).Result;
-
-            //Assert
-            Assert.That(result, Is.InstanceOf(typeof(Asset)));
-
-            //Check that the delete method was called once
-            _assetRepositoryMock.Verify(c => c.Delete(id), Times.Once);
-        }
-
-        [Test]
         public void Calling_UpdateUserByUserId_ON_ServiceLayer_Should_Call_UserRepository_and_Return_updated_User()
         {
             //Arrange

@@ -52,24 +52,6 @@ namespace NUnitTestingServices
         }
 
         [Test]
-        public void Calling_DeleteTransaction_ON_ServiceLayer_Should_Call_transactionRepository_and_Return_deleted_Transaction()
-        {
-            Guid Id = _MockLstTransactions[0].Id;
-            //Arrange 
-            _transactionRepositoryMock.Setup(m => m.GetSingle(Id)).Returns(_MockLstTransactions[0]);
-            _transactionRepositoryMock.Setup(m => m.Delete(Id).Result).Returns(_MockLstTransactions[0]);
-
-            //act
-            Transaction result = _transactionService.DeleteTransaction(Id).Result;
-
-            //Assert
-            Assert.That(result, Is.InstanceOf(typeof(Transaction)));
-
-            //Check that the delete method was called once
-            _transactionRepositoryMock.Verify(c => c.Delete(Id), Times.Once);
-        }
-
-        [Test]
         public void Calling_UpdateTransaction_ON_ServiceLayer_Should_Call_TransactionRepository_and_Return_updated_Transaction()
         {
             //Arrange
