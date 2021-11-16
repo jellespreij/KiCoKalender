@@ -1,4 +1,5 @@
-﻿using Models;
+﻿using Microsoft.Extensions.Configuration;
+using Models;
 using Repositories;
 using Repositories.Interfaces;
 using SendGrid;
@@ -16,11 +17,13 @@ namespace Services
     {
         private IFamilyRepository _familyRepository;
         private IUserRepository _userRepository;
+        public IConfiguration _configuration { get; }
 
-        public FamilyService(IFamilyRepository familyRepository, IUserRepository userRepository)
+        public FamilyService(IFamilyRepository familyRepository, IUserRepository userRepository, IConfiguration configuration)
         {
             _familyRepository = familyRepository;
             _userRepository = userRepository;
+            _configuration = configuration;
         }
 
         public void AddUserToFamily(User user, Guid id)
@@ -50,13 +53,12 @@ namespace Services
 
             addedFamily = _familyRepository.AddUserToFamily(userToAdd, family.Id).Result;
 
-            //addedFamily.Users.Add(userToAdd);
             return addedFamily;
         }
 
         public async void SendMail(string toEmail)
         {
-            var apikey = "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";
+            var apikey = _configuration.GetConnectionString("sendGridKey");
             var client = new SendGridClient(apikey);
             var from = new EmailAddress("kimvangelder@kpnmail.nl");
             var subject = "Uitnodiging KiCoKalender";

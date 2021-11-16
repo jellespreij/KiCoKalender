@@ -2,6 +2,7 @@ using Auth;
 using Auth.Interfaces;
 using KiCoKalender.Configurations;
 using KiCoKalender.Controllers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Extensions.OpenApi;
 using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Extensions;

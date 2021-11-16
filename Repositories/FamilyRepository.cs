@@ -24,8 +24,10 @@ namespace Repositories
             await _context.Database.EnsureCreatedAsync();
 
             var familyToUpdate = _context.Set<Family>().Where(entity => entity.Id == id).FirstOrDefault();
-            familyToUpdate.Folders.Add(folder);
-
+            if(familyToUpdate is not null)
+            {
+                familyToUpdate.Folders.Add(folder);
+            }
             Commit();
         }
 
@@ -34,8 +36,10 @@ namespace Repositories
             await _context.Database.EnsureCreatedAsync();
 
             Family familyToUpdate = _context.Set<Family>().Where(entity => entity.Id == id).FirstOrDefault();
-            familyToUpdate.Users.Add(user);
-
+            if (familyToUpdate is not null)
+            {
+                familyToUpdate.Users.Add(user);
+            }
             Commit();
 
             return familyToUpdate;
@@ -46,8 +50,10 @@ namespace Repositories
             await _context.Database.EnsureCreatedAsync();
 
             var familyToUpdate = _context.Set<Family>().Where(entity => entity.Id == user.FamilyId).FirstOrDefault();
-            familyToUpdate.Users.Remove(user);
-
+            if (familyToUpdate is not null)
+            {
+                familyToUpdate.Users.Remove(user);
+            }
             Commit();
         }
     }

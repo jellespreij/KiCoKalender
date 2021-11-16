@@ -12,15 +12,13 @@ namespace Services
 {
     public class BlobService
     {
-        private const string CONTAINERPREFIX = "kicokalender";
-
-        public async Task<CloudBlobContainer> GetBlobContainer()
+        public async Task<CloudBlobContainer> GetBlobContainer(Guid? familyId)
         {
             CloudStorageAccount storageAccount = StorageAccountSettings.CreateStorageAccountFromConnectionString();
 
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
-            CloudBlobContainer container = blobClient.GetContainerReference(CONTAINERPREFIX);
+            CloudBlobContainer container = blobClient.GetContainerReference(familyId.ToString());
 
             try
             {

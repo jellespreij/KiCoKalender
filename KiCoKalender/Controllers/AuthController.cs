@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
@@ -21,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace KiCoKalender.Controllers
 {
-	public class AuthController
+    public class AuthController
     {
         public ILogger Logger { get; }
         ITokenService TokenService { get; }

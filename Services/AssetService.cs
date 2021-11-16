@@ -30,7 +30,7 @@ namespace Services
         {
             Folder folder = _folderRepository.GetSingle(folderId);
 
-            CloudBlobContainer container = await _blobService.GetBlobContainer();
+            CloudBlobContainer container = await _blobService.GetBlobContainer(folder.FamilyId);
             CloudBlockBlob blockBlob = container.GetBlockBlobReference(folder.Name + "/" + file.FileName);
 
             try
@@ -59,7 +59,8 @@ namespace Services
         public async Task<Asset> DeleteAsset(Guid id)
         {
             Asset asset = _assetRepository.GetSingle(id);
-            CloudBlobContainer container = await _blobService.GetBlobContainer();
+            Folder folder = _folderRepository.GetSingle((Guid)asset.FolderId);
+            CloudBlobContainer container = await _blobService.GetBlobContainer(folder.FamilyId);
 
             var blob = container.GetBlobReference(asset.Folder.Name + "/" + asset.Name);
             await blob.DeleteIfExistsAsync();

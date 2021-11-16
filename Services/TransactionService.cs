@@ -26,7 +26,7 @@ namespace Services
 
         public async Task<Transaction> AddTransaction(FilePart file, Transaction transaction)
         {
-            CloudBlobContainer container = await _blobService.GetBlobContainer();
+            CloudBlobContainer container = await _blobService.GetBlobContainer(transaction.FamilyId);
             CloudBlockBlob blockBlob = container.GetBlockBlobReference("transactions/" + file.FileName);
 
             try
@@ -51,7 +51,7 @@ namespace Services
         {
             Transaction transaction = _transactionRepository.GetSingle(id);
 
-            CloudBlobContainer container = await _blobService.GetBlobContainer();
+            CloudBlobContainer container = await _blobService.GetBlobContainer(transaction.FamilyId);
 
             var blob = container.GetBlobReference("transactions/" + transaction.FileName);
             await blob.DeleteIfExistsAsync();
