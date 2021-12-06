@@ -36,14 +36,13 @@ namespace Auth
 				catch (Exception e)
 				{
 					HttpResponseData Response = Request.CreateResponse(HttpStatusCode.BadRequest);
-					Console.WriteLine(e.Message);
+					Logger.LogError(e.Message);
 					return Response;
 				}
 			}
 			catch (Exception e)
 			{
 				Logger.LogError(e.Message);
-
 				HttpResponseData Response = Request.CreateResponse(HttpStatusCode.Unauthorized);
 				return Response;
 			}

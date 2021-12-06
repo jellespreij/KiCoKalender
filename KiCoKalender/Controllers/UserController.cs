@@ -164,12 +164,12 @@ namespace KiCoKalender.Controllers
             string id,
             FunctionContext executionContext)
         {
-            return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) =>
+            return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal currentUser) =>
             {
                 // Generate output
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-                User deletedUser = UserService.DeleteUser(Guid.Parse(id)).Result;
+                User deletedUser = UserService.DeleteUser(Guid.Parse(id), Guid.Parse(currentUser.FindFirst(ClaimTypes.Sid).Value)).Result;
 
                 if (deletedUser is null)
                 {
@@ -196,7 +196,7 @@ namespace KiCoKalender.Controllers
             string id,
             FunctionContext executionContext)
         {
-            return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal User) =>
+            return await Authenticate.ExecuteForUser(req, executionContext, async (ClaimsPrincipal currentUser) =>
             {
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
                 try
@@ -204,7 +204,7 @@ namespace KiCoKalender.Controllers
                     string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                     User user = JsonConvert.DeserializeObject<User>(requestBody);
 
-                    User updatedUser = UserService.UpdateUser(user, Guid.Parse(id));
+                    User updatedUser = UserService.UpdateUser(user, Guid.Parse(id), Guid.Parse(currentUser.FindFirst(ClaimTypes.Sid).Value));
 
                     if (updatedUser is null)
                     {

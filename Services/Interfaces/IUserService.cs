@@ -1,7 +1,9 @@
-﻿using Models;
+﻿using Microsoft.Azure.Functions.Worker;
+using Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,8 +13,8 @@ namespace Services.Interfaces
     {
         User FindUserByUserId(Guid userId);
         User AddUser(User user);
-        User UpdateUser(User user, Guid id);
-        Task<User> DeleteUser(Guid id);
+        User UpdateUser(User user, Guid id, Guid currentUser);
+        Task<User> DeleteUser(Guid id, Guid currentUser);
         User FindUserByEmail(string email);
     }
 }

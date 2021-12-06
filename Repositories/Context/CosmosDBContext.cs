@@ -22,8 +22,8 @@ namespace Repositories.Context
         //DONT FORGET TO NUGET INSTALL: Install-Package Microsoft.EntityFrameworkCore.Cosmos -Version 5.0.10 for DbContextbuilder Use Cosmos
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseCosmos(
-                "https://cosmosdb-kicokalender.documents.azure.com:443/",
-                "6avXm88U8GBt9hjSkOQWPTExyvuojsiNRjxt8iiOXD13ErDgnckJrraZlpIiE8S08peY1JccfxTrdZmsXJDzYw==",
+                "https://cosmos-kicokalender.documents.azure.com:443/",
+                "1pfr6MjEKszGfhsWnoyGtJ1YkqwIg2Hm3Y8RYnbhxNar05p9Xf8HYtNXAFKSMHBhsFIHfmjKl58j4nFs3BU8MA==",
                 databaseName: "KiCoKalenderDB");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

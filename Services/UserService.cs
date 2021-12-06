@@ -1,11 +1,10 @@
-﻿using Models;
-using Repositories;
+﻿using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
+using Models;
 using Repositories.Interfaces;
 using Services.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Services
@@ -36,20 +35,30 @@ namespace Services
             }
         }
 
-        public async Task<User> DeleteUser(Guid id)
+        public async Task<User> DeleteUser(Guid id, Guid currentUser)
         {
-            User user = _userRepository.GetSingle(id);
-             _familyRepository.RemoveUserFromFamily(user);
-            return _userRepository.Delete(id).Result;
+            if(currentUser == id)
+            {
+                User user = _userRepository.GetSingle(id);
+                _familyRepository.RemoveUserFromFamily(user);
+                return _userRepository.Delete(id).Result;
+            }
+            return null;
+
         }
 
         public User FindUserByUserId(Guid userId)
         {
             return _userRepository.GetSingle(userId);
         }
-        public User UpdateUser(User user, Guid id)
+        public User UpdateUser(User user, Guid id, Guid currentUser)
         {
-            return _userRepository.Update(user, id).Result;
+            if (currentUser == id)
+            {
+                return _userRepository.Update(user, id).Result;
+            }
+            return null;
+
         }
 
         public User FindUserByEmail(string email)
