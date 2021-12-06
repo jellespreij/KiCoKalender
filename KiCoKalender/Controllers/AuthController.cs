@@ -43,7 +43,6 @@ namespace KiCoKalender.Controllers
         public async Task<HttpResponseData> Login([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req, FunctionContext executionContext)
         {
             HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
-
             try
             {
                 Login login = JsonConvert.DeserializeObject<Login>(await new StreamReader(req.Body).ReadToEndAsync());
