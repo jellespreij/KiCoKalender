@@ -12,7 +12,6 @@ namespace Models
 	[JsonConverter(typeof(StringEnumConverter))]
 	public enum Invited
 	{
-
 		[EnumMember(Value = "Everyone")]
 		everyone = 1,
 

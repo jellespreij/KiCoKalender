@@ -139,7 +139,6 @@ namespace KiCoKalender.Controllers
                     string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                     User user = JsonConvert.DeserializeObject<User>(requestBody);
                     // Generate output
-
                     if (user is null)
                     {
                         response = req.CreateResponse(HttpStatusCode.BadRequest);

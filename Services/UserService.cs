@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Functions.Worker;
+﻿using log4net;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Models;
 using Repositories.Interfaces;
@@ -13,9 +14,11 @@ namespace Services
     {
         private IUserRepository _userRepository;
         private IFamilyRepository _familyRepository;
+        ILogger Logger { get; }
 
-        public UserService(IUserRepository userRepository, IFamilyRepository familyRepository)
+        public UserService(ILogger<UserService> logger, IUserRepository userRepository, IFamilyRepository familyRepository)
         {
+            Logger = logger;
             _userRepository = userRepository;
             _familyRepository = familyRepository;
         }
@@ -30,7 +33,7 @@ namespace Services
             }
             else
             {
-                Console.WriteLine("User already exists");
+                Logger.LogError("User already exists");
                 return null;
             }
         }

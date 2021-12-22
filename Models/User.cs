@@ -43,10 +43,6 @@ namespace Models
         [JsonRequired]
         public string LastName { get; set; }
 
-        [OpenApiProperty(Description = "Gets or sets the age.")]
-        [JsonRequired]
-        public DateTime Age { get; set; }
-
         [OpenApiProperty(Description = "Gets or sets the Role for the user.")]
         [JsonRequired]
         public Role Role { get; set; }
@@ -55,9 +51,13 @@ namespace Models
         [JsonRequired]
         public string Address { get; set; }
 
-        [OpenApiProperty(Description = "Gets or sets the postcode.")]
+        [OpenApiProperty(Description = "Gets or sets the phonenumber.")]
         [JsonRequired]
-        public string Postcode { get; set; }
+        public string PhoneNumber { get; set; }
+
+        [OpenApiProperty(Description = "Gets or sets the zipcode.")]
+        [JsonRequired]
+        public string Zipcode { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets created date.")]
         public DateTime Created { get; set; }
@@ -67,7 +67,7 @@ namespace Models
 
         }
 
-        public User(Guid id, string firstName, string lastName, string email, string password, Role role, DateTime age, string address, string postcode)
+        public User(Guid id, string firstName, string lastName, string email, string password, Role role, string address, string phoneNumber, string zipcode)
         {
             Id = id;
             FirstName = firstName;
@@ -75,9 +75,9 @@ namespace Models
             Email = email;
             Password = password;
             Role = role;
-            Age = age;
             Address = address;
-            Postcode = postcode;
+            PhoneNumber = phoneNumber;
+            Zipcode = zipcode;
             Created = DateTime.Now;
         }
     }
@@ -94,9 +94,9 @@ namespace Models
                                                 FirstName = "Kim",
                                                 LastName = "Kim",
                                                 Role = Role.Parent,
-                                                Age = new DateTime(2000, 10, 10),
                                                 Address = "street",
-                                                Postcode = "1234AB",
+                                                PhoneNumber = "0623145896",
+                                                Zipcode = "1234AB",
                                                 Created = DateTime.Now
                                             },
                                             NamingStrategy));

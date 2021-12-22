@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Moq;
 using System.Linq;
 using Repositories.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace NUnitTestingServices
 {
@@ -18,14 +19,15 @@ namespace NUnitTestingServices
         private List<Asset> _MockLstAssets;
         private BlobService _blobService;
         private Folder _MockFolder;
+        private ILogger Logger { get; }
 
         [SetUp]
         public void Setup()
         {
             _folderRepositoryMock = new Mock<IFolderRepository>();
             _assetRepositoryMock = new Mock<IAssetRepository>();
-            _blobService = new BlobService();
-            _assetService = new AssetService(_assetRepositoryMock.Object, _folderRepositoryMock.Object, _blobService);
+            _blobService = new BlobService((ILogger<BlobService>)Logger);
+            _assetService = new AssetService((ILogger<AssetService>)Logger, _assetRepositoryMock.Object, _folderRepositoryMock.Object, _blobService);
             _MockLstAssets = new List<Asset>();
 
             Asset assetOne = new Asset(Guid.NewGuid(), "picture.png", "its a picture", DateTime.Now, "-url-", Guid.NewGuid().ToString());

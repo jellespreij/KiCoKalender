@@ -47,7 +47,7 @@ namespace KiCoKalender.Controllers
             {
                 Login login = JsonConvert.DeserializeObject<Login>(await new StreamReader(req.Body).ReadToEndAsync());
                 LoginResult result = await TokenService.CreateToken(login);
-
+                new System.Net.Mail.MailAddress(login.Email);
                 if (result is null)
                 {
                     response = req.CreateResponse(HttpStatusCode.NotFound);

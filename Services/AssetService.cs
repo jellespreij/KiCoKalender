@@ -1,6 +1,7 @@
 ﻿using HttpMultipartParser;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
+using Microsoft.Extensions.Logging;
 using Models;
 using Repositories;
 using Repositories.Interfaces;
@@ -18,9 +19,11 @@ namespace Services
         private IAssetRepository _assetRepository;
         private IFolderRepository _folderRepository;
         private BlobService _blobService;
+        ILogger Logger { get; }
 
-        public AssetService(IAssetRepository assetRepository, IFolderRepository folderRepository, BlobService blobService)
+        public AssetService(ILogger<AssetService> logger, IAssetRepository assetRepository, IFolderRepository folderRepository, BlobService blobService)
         {
+            Logger = logger;
             _assetRepository = assetRepository;
             _folderRepository = folderRepository;
             _blobService = blobService;
@@ -31,31 +34,47 @@ namespace Services
             Folder folder = _folderRepository.GetSingle(folderId);
 
             CloudBlobContainer container = await _blobService.GetBlobContainer(folder.FamilyId);
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference(folder.Name + "/" + file.FileName);
 
-            try
+            if (checkFile(file))
             {
-                using (var filestream = file.Data)
+                CloudBlockBlob blockBlob = container.GetBlockBlobReference(folder.Name + "/" + file.FileName);
+
+                try
                 {
-                    blockBlob.UploadFromStream(filestream);
+                    using (var filestream = file.Data)
+                    {
+                        blockBlob.UploadFromStream(filestream);
+                    }
                 }
-            }
-            catch (StorageException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+                catch (StorageException ex)
+                {
+                    Logger.LogError("Storage Error: " + ex.Message);
+                }
 
-            Asset asset = new()
-            {
-                Name = file.FileName,
-                Url = blockBlob.Uri.ToString(),
-                PartitionKey = folder.PartitionKey
-            };
-
-            Asset addedAsset = await _assetRepository.Add(asset);
-            return _assetRepository.AddAssetToFolder(folder, addedAsset.Id).Result;
+                Asset asset = new()
+                {
+                    Name = file.FileName,
+                    Url = blockBlob.Uri.ToString(),
+                    PartitionKey = folder.PartitionKey
+                };
+                Asset addedAsset = await _assetRepository.Add(asset);
+                return _assetRepository.AddAssetToFolder(folder, addedAsset.Id).Result;
+            }
+            return null;
         }
 
+        public bool checkFile(FilePart file)
+        {
+            string[] extensions = { "image/jpeg", "image/png",
+                        "application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"};
+            List<string> ListExtensions = new List<string>(extensions);
+            foreach (var item in ListExtensions)
+            {
+                if (file.ContentType == item)
+                    return true;
+            }
+            return false;
+        }
         public async Task<Asset> DeleteAsset(Guid id)
         {
             Asset asset = _assetRepository.GetSingle(id);

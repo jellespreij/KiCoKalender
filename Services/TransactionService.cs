@@ -1,6 +1,7 @@
 ﻿using HttpMultipartParser;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
+using Microsoft.Extensions.Logging;
 using Models;
 using Repositories;
 using Repositories.Interfaces;
@@ -17,9 +18,11 @@ namespace Services
     {
         private ITransactionRepository _transactionRepository;
         private BlobService _blobService;
+        private ILogger Logger { get; }
 
-        public TransactionService(ITransactionRepository transactionRepository, BlobService blobService)
+        public TransactionService(ILogger<TransactionService> logger, ITransactionRepository transactionRepository, BlobService blobService)
         {
+            Logger = logger;
             _transactionRepository = transactionRepository;
             _blobService = blobService;
         }
@@ -27,26 +30,43 @@ namespace Services
         public async Task<Transaction> AddTransaction(FilePart file, Transaction transaction)
         {
             CloudBlobContainer container = await _blobService.GetBlobContainer(transaction.FamilyId);
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference("transactions/" + file.FileName);
 
-            try
+            if (checkFile(file))
             {
-                using (var filestream = file.Data)
+                CloudBlockBlob blockBlob = container.GetBlockBlobReference("transactions/" + file.FileName);
+
+                try
                 {
-                    blockBlob.UploadFromStream(filestream);
+                    using (var filestream = file.Data)
+                    {
+                        blockBlob.UploadFromStream(filestream);
+                    }
                 }
-            }
-            catch (StorageException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-             
-            transaction.FileName = file.FileName;
-            transaction.Url = blockBlob.Uri.ToString();
+                catch (StorageException ex)
+                {
+                    Logger.LogError("Error: "+ ex.Message);
+                }
 
-            return _transactionRepository.Add(transaction).Result;
+                transaction.FileName = file.FileName;
+                transaction.Url = blockBlob.Uri.ToString();
+
+                return _transactionRepository.Add(transaction).Result;
+            }
+            return null;
+
         }
-
+        public bool checkFile(FilePart file)
+        {
+            string[] extensions = { "image/jpeg", "image/png",
+                        "application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"};
+            List<string> ListExtensions = new List<string>(extensions);
+            foreach (var item in ListExtensions)
+            {
+                if (file.ContentType == item)
+                    return true;
+            }
+            return false;
+        }
         public async Task<Transaction> DeleteTransaction(Guid id)
         {
             Transaction transaction = _transactionRepository.GetSingle(id);

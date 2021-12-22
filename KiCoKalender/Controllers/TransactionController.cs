@@ -77,7 +77,14 @@ namespace KiCoKalender.Controllers
 
 
                         Transaction addedTransaction = TransactionService.AddTransaction(parsedFile.Result.Files.First(), transaction).Result;
-                        await response.WriteAsJsonAsync(addedTransaction);
+                        if (addedTransaction is null)
+                        {
+                            response = req.CreateResponse(HttpStatusCode.BadRequest);
+                        }
+                        else
+                        {
+                            await response.WriteAsJsonAsync(addedTransaction);
+                        }                        
                     }
 
                 }

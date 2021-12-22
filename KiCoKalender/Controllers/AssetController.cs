@@ -68,7 +68,15 @@ namespace KiCoKalender.Controllers
                     else
                     {
                         Asset addedAsset = AssetService.AddAsset(parsedFile.Result.Files.First(), Guid.Parse(folderId)).Result;
-                        await response.WriteAsJsonAsync(addedAsset);
+                        if (addedAsset is null)
+                        {
+                            response = req.CreateResponse(HttpStatusCode.BadRequest);
+                        }
+                        else
+                        {
+                            await response.WriteAsJsonAsync(addedAsset);
+                        }
+        
                     }
                 }
                 catch (Exception ex)

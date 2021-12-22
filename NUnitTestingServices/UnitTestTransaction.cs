@@ -9,6 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.IO;
 using Repositories.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace NUnitTestingServices
 {
@@ -18,13 +19,14 @@ namespace NUnitTestingServices
         private TransactionService _transactionService;
         private List<Transaction> _MockLstTransactions;
         private BlobService _blobService;
+        private ILogger Logger { get; }
 
         [SetUp]
         public void Setup()
         {
             _transactionRepositoryMock = new Mock<ITransactionRepository>();
-            _blobService = new BlobService();
-            _transactionService = new TransactionService(_transactionRepositoryMock.Object, _blobService);
+            _blobService = new BlobService((ILogger<BlobService>)Logger);
+            _transactionService = new TransactionService((ILogger<TransactionService>)Logger,_transactionRepositoryMock.Object, _blobService);
 
             _MockLstTransactions = new List<Transaction>();
             Transaction transactionOne = new Transaction(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Kadootjes", "file1.txt", "http://127.0.0.1:10000/devstoreaccount1/powerpuffgirls/Mojojojo.png", 12.45, "was iemand jarig", DateTime.Now, Guid.NewGuid().ToString());

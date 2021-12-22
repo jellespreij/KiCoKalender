@@ -126,6 +126,8 @@ namespace KiCoKalender.Controllers
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 User user = JsonConvert.DeserializeObject<User>(requestBody);
 
+                new System.Net.Mail.MailAddress(user.Email);
+
                 User addedUser = UserService.AddUser(user);
 
                 if (addedUser is null)

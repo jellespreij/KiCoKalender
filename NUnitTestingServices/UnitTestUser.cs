@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using Moq;
 using Repositories.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace NUnitTestingServices
 {
@@ -16,16 +17,17 @@ namespace NUnitTestingServices
         private Mock<IFamilyRepository> _familyRepositoryMock;
         private UserService _userService;
         private List<User> _MockLstUsers;
+        private ILogger Logger { get; }
         [SetUp]
         public void Setup()
         {
             _userRepositoryMock = new Mock<IUserRepository>();
             _familyRepositoryMock = new Mock<IFamilyRepository>();
-            _userService = new UserService(_userRepositoryMock.Object, _familyRepositoryMock.Object);
+            _userService = new UserService((ILogger<UserService>)Logger,_userRepositoryMock.Object, _familyRepositoryMock.Object);
             
             _MockLstUsers = new List<User>();
-            User userOne = new User(Guid.NewGuid(), "Cyprus", "Cypruson", "email.email@gmail.com", "password1", Role.Child, DateTime.Now, "straat 123", "1234AB");
-            User userTwo = new User(Guid.NewGuid(), "Crete", "Alebllo","crete@hotmail.com", "HeelGeheimwachtwoord!", Role.Parent, DateTime.Now, "de hogenveen 12", "2375HY");
+            User userOne = new User(Guid.NewGuid(), "Cyprus", "Cypruson", "email.email@gmail.com", "password1", Role.Child, "straat 123", "0652148596", "1234AB");
+            User userTwo = new User(Guid.NewGuid(), "Crete", "Alebllo","crete@hotmail.com", "HeelGeheimwachtwoord!", Role.Parent, "de hogenveen 12", "0652148596", "2375HY");
 
             _MockLstUsers.Add(userOne);
             _MockLstUsers.Add(userTwo);
@@ -86,7 +88,7 @@ namespace NUnitTestingServices
             _userRepositoryMock.Setup(m => m.Delete(_MockLstUsers[0].Id).Result).Returns(_MockLstUsers[0]);
 
             //act
-            User result = _userService.DeleteUser(_MockLstUsers[0].Id).Result;
+            User result = _userService.DeleteUser(_MockLstUsers[0].Id, _MockLstUsers[0].Id).Result;
 
             //Assert
             Assert.That(result, Is.InstanceOf(typeof(User)));
@@ -102,7 +104,7 @@ namespace NUnitTestingServices
             _userRepositoryMock.Setup(m => m.Update(_MockLstUsers[0], _MockLstUsers[0].Id).Result).Returns(_MockLstUsers[0]);
 
             //act
-            User result = _userService.UpdateUser(_MockLstUsers[0], _MockLstUsers[0].Id);
+            User result = _userService.UpdateUser(_MockLstUsers[0], _MockLstUsers[0].Id, _MockLstUsers[0].Id);
 
             //Assert
             Assert.That(result, Is.InstanceOf(typeof(User)));

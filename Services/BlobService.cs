@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
+using Microsoft.Extensions.Logging;
 using Models;
 using Repositories;
 using System;
@@ -12,6 +13,11 @@ namespace Services
 {
     public class BlobService
     {
+        private ILogger Logger { get; }
+        public BlobService(ILogger<BlobService> logger)
+        {
+            Logger = logger;
+        }
         public async Task<CloudBlobContainer> GetBlobContainer(Guid? familyId)
         {
             CloudStorageAccount storageAccount = StorageAccountSettings.CreateStorageAccountFromConnectionString();
@@ -30,7 +36,7 @@ namespace Services
             }
             catch (StorageException ex)
             {
-                Console.WriteLine(ex.Message);
+                Logger.LogError("Storage Error: "+ex.Message);
             }
 
             return container;

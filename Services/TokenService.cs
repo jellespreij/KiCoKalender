@@ -72,7 +72,8 @@ namespace Services
             {
                 JwtSecurityToken Token = await CreateToken(new Claim[] {
                 new Claim(ClaimTypes.Role, "User"),
-                new Claim(ClaimTypes.Sid, userObject.Id.ToString())
+                new Claim(ClaimTypes.Sid, userObject.Id.ToString()),
+                new Claim(ClaimTypes.GroupSid, userObject.FamilyId.ToString())
                 });
 
                 return new LoginResult(Token);
