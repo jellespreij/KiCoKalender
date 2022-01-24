@@ -25,13 +25,15 @@ namespace KiCoKalender.Controllers
     {
         public ILogger Logger { get; }
         IUserService UserService { get; }
+        IValidationService ValidationService { get; }
         IAuthenticate Authenticate { get; }
 
-        public UserController(ILogger<UserController> Logger, IUserService userService, IAuthenticate authenticate)
+        public UserController(ILogger<UserController> Logger, IUserService userService, IAuthenticate authenticate, IValidationService validationService)
         {
             this.Logger = Logger;
             UserService = userService;
             Authenticate = authenticate;
+            ValidationService = validationService;
         }
 
         [Function("FindUserByUserId")]
@@ -53,7 +55,7 @@ namespace KiCoKalender.Controllers
             {
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-                User user = UserService.FindUserByUserId(Guid.Parse(userId));
+                UserDTO user = UserService.FindUserDTOByUserId(Guid.Parse(userId));
 
                 if (user is not null)
                 {
@@ -91,7 +93,7 @@ namespace KiCoKalender.Controllers
 
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-                User user = UserService.FindUserByEmail(email);
+                UserDTO user = UserService.FindUserDTOByEmail(email);
 
                 if (user is null)
                 {
@@ -124,9 +126,17 @@ namespace KiCoKalender.Controllers
             try
             {
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                User user = JsonConvert.DeserializeObject<User>(requestBody);
+                string checkedUserInput = ValidationService.CheckUserInput(requestBody);
+                User user = JsonConvert.DeserializeObject<User>(checkedUserInput);
 
                 new System.Net.Mail.MailAddress(user.Email);
+
+                if (!ValidationService.CheckPasswordStrenght(user.Password))
+                {
+                    response = req.CreateResponse(HttpStatusCode.BadRequest);
+                    Logger.LogError("Password is not strong enough");
+                    return response;
+                }
 
                 User addedUser = UserService.AddUser(user);
 
@@ -186,7 +196,8 @@ namespace KiCoKalender.Controllers
         [UserAuth]
         [OpenApiOperation(operationId: "updateUser", tags: new[] { "user" }, Summary = "Update an existing user", Description = "This updates an existing user.", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiParameter(name: "id", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "Id of user to return", Description = "Id of user to return", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(User), Required = true, Description = "User that needs to be updated")]
+        //[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(User), Required = true, Description = "User that needs to be updated")]
+        [OpenApiRequestBody(contentType: "multipart/form-data", bodyType: typeof(UserUpdateDTO), Description = "Parameters", Required = true)]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(User), Summary = "User details updated", Description = "User details updated", Example = typeof(DummyUserExample))]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "User not found", Description = "User not found")]

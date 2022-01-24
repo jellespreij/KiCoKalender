@@ -68,5 +68,15 @@ namespace Services
         {
             return _userRepository.FindUserByEmail(email).Result;
         }
+
+        public UserDTO FindUserDTOByUserId(Guid userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public UserDTO FindUserDTOByEmail(string email)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

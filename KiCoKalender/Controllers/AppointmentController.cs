@@ -26,13 +26,15 @@ namespace KiCoKalender.Controllers
     {
         ILogger Logger { get; }
         IAppointmentService AppointmentService { get; }
+        IValidationService InputCheckService { get; }
         IAuthenticate Authenticate { get; }
 
-        public AppointmentController(ILogger<AppointmentController> Logger, IAppointmentService appointmentService, IAuthenticate authenticate)
+        public AppointmentController(ILogger<AppointmentController> Logger, IAppointmentService appointmentService, IAuthenticate authenticate, IValidationService inputCheckService)
         {
             this.Logger = Logger;
             AppointmentService = appointmentService;
             Authenticate = authenticate;
+            InputCheckService = inputCheckService;
         }
 
         [Function("AddAppointment")]
@@ -56,7 +58,8 @@ namespace KiCoKalender.Controllers
                 try
                 {
                     string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                    Appointment appointment = JsonConvert.DeserializeObject<Appointment>(requestBody);
+                    string checkedUserInput = InputCheckService.CheckUserInput(requestBody);
+                    Appointment appointment = JsonConvert.DeserializeObject<Appointment>(checkedUserInput);
 
                     if (appointment is null)
                     {

@@ -12,9 +12,11 @@ namespace Services.Interfaces
     public interface IUserService
     {
         User FindUserByUserId(Guid userId);
+        UserDTO FindUserDTOByUserId(Guid userId);
         User AddUser(User user);
         User UpdateUser(User user, Guid id, Guid currentUser);
         Task<User> DeleteUser(Guid id, Guid currentUser);
         User FindUserByEmail(string email);
+        UserDTO FindUserDTOByEmail(string email);
     }
 }

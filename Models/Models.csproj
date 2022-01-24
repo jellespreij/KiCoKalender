@@ -5,6 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DTOs\UserDTOUpdate.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="DTOs\NewFile1.txt" />
+    <None Remove="DTOs\Us" />
+    <None Remove="DTOs\UserDTOUpdate" />
+    <None Remove="Helpers\NewFile1.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" Version="4.0.1" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.OpenApi" Version="0.8.1-preview" />
     <PackageReference Include="Microsoft.OpenApi" Version="1.2.3" />

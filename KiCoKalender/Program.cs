@@ -43,6 +43,7 @@ namespace KiCoKalender
 
 			Services.AddSingleton<UserController>();
 			Services.AddSingleton<IUserService, UserService>();
+			Services.AddSingleton<IValidationService, ValidationService>();
 			Services.AddTransient<IUserRepository, UserRepository>();
 
 			Services.AddSingleton<AppointmentController>();

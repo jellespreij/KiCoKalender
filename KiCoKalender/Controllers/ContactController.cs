@@ -23,12 +23,14 @@ namespace KiCoKalender.Controllers
     {
         public ILogger Logger { get; }
         IContactService ContactService { get; }
+        IValidationService ValidationService { get; }
         IAuthenticate Authenticate { get; }
-        public ContactController(ILogger<ContactController> Logger, IContactService contactService, IAuthenticate authenticate)
+        public ContactController(ILogger<ContactController> Logger, IContactService contactService, IAuthenticate authenticate, IValidationService validationService)
         {
             this.Logger = Logger;
             ContactService = contactService;
             Authenticate = authenticate;
+            ValidationService = validationService;
         }
 
         [Function("AddContact")]
@@ -50,7 +52,8 @@ namespace KiCoKalender.Controllers
                 try
                 {
                     string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                    Contact contact = JsonConvert.DeserializeObject<Contact>(requestBody);
+                    string checkedUserInput = ValidationService.CheckUserInput(requestBody);
+                    Contact contact = JsonConvert.DeserializeObject<Contact>(checkedUserInput);
 
                     if (contact is null)
                     {

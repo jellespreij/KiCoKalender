@@ -23,13 +23,15 @@ namespace KiCoKalender.Controllers
     {
         ILogger Logger { get; }
         IFamilyService FamilyService { get; }
+        IValidationService ValidationService { get; }
         IAuthenticate Authenticate { get; }
 
-        public FamilyController(ILogger<FamilyController> Logger, IFamilyService familyService, IAuthenticate authenticate)
+        public FamilyController(ILogger<FamilyController> Logger, IFamilyService familyService, IAuthenticate authenticate, IValidationService validationService)
         {
             this.Logger = Logger;
             FamilyService = familyService;
             Authenticate = authenticate;
+            ValidationService = validationService;
         }
 
         [Function("AddFamily")]
@@ -55,7 +57,8 @@ namespace KiCoKalender.Controllers
                 try
                 {
                     string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                    Family family = JsonConvert.DeserializeObject<Family>(requestBody);
+                    string checkedUserInput = ValidationService.CheckUserInput(requestBody);
+                    Family family = JsonConvert.DeserializeObject<Family>(checkedUserInput);
 
                     if (family is null)
                     {
