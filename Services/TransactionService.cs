@@ -3,6 +3,7 @@ using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Logging;
 using Models;
+using Models.Helpers;
 using Repositories;
 using Repositories.Interfaces;
 using Services.Interfaces;
@@ -25,6 +26,11 @@ namespace Services
             Logger = logger;
             _transactionRepository = transactionRepository;
             _blobService = blobService;
+        }
+
+        public Transaction FindTransactionByTransactionId(Guid transactionId)
+        {
+            return _transactionRepository.GetSingle(transactionId);
         }
 
         public async Task<Transaction> AddTransaction(FilePart file, Transaction transaction)
@@ -83,10 +89,24 @@ namespace Services
         {
             return _transactionRepository.FindBy(e => e.FamilyId == familyId);
         }
-
-        public Transaction UpdateTransaction(Transaction transaction, Guid id)
+        
+        public IEnumerable<TransactionDTO> FindTransactionDTOByFamilyId(Guid familyId)
         {
-            return _transactionRepository.Update(transaction, id).Result;
+            IEnumerable<Transaction> transactions = FindTransactionByFamilyId(familyId);
+
+            return TransactionDTOHelper.ToDTO(transactions);
+        }
+
+        public Transaction UpdateTransaction(TransactionUpdateDTO transactionUpdate, Guid id)
+        {
+            Transaction transactionToUpdate = FindTransactionByTransactionId(id);
+
+            transactionToUpdate.Name = transactionUpdate.Name;
+            transactionToUpdate.FileName = transactionUpdate.FileName;
+            transactionToUpdate.Amount = transactionUpdate.Amount;
+            transactionToUpdate.Description = transactionUpdate.Description;
+
+            return _transactionRepository.Update(transactionToUpdate, id).Result;
         }
 
     }

@@ -3,6 +3,7 @@ using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Logging;
 using Models;
+using Models.Helpers;
 using Repositories;
 using Repositories.Interfaces;
 using Services.Interfaces;
@@ -27,6 +28,11 @@ namespace Services
             _assetRepository = assetRepository;
             _folderRepository = folderRepository;
             _blobService = blobService;
+        }
+
+        public Asset FindAssetByAssetId(Guid assetId)
+        {
+            return _assetRepository.GetSingle(assetId);
         }
 
         public async Task<Asset> AddAsset(FilePart file, Guid folderId)
@@ -92,10 +98,22 @@ namespace Services
         {
             return _assetRepository.FindBy(e => e.FolderId == folderId);
         }
-
-        public Asset UpdateAsset(Asset asset, Guid id)
+        
+        public IEnumerable<AssetDTO> FindAssetsDTOByFolderId(Guid folderId)
         {
-            return _assetRepository.Update(asset, id).Result;
+            IEnumerable<Asset> assets = FindAssetsByFolderId(folderId);
+
+            return AssetDTOHelper.ToDTO(assets);
+        }
+
+        public Asset UpdateAsset(AssetUpdateDTO assetUpdate, Guid id)
+        {
+            Asset assetToUpdate = FindAssetByAssetId(id);
+
+            assetToUpdate.Name = assetUpdate.Name;
+            assetToUpdate.Description = assetUpdate.Description;
+
+            return _assetRepository.Update(assetToUpdate, id).Result;
         }
     }
 }

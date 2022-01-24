@@ -2,6 +2,7 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Models;
+using Models.Helpers;
 using Repositories.Interfaces;
 using Services.Interfaces;
 using System;
@@ -54,14 +55,21 @@ namespace Services
         {
             return _userRepository.GetSingle(userId);
         }
-        public User UpdateUser(User user, Guid id, Guid currentUser)
+
+        public User UpdateUser(UserUpdateDTO userUpdate, Guid id, Guid currentUser)
         {
             if (currentUser == id)
             {
-                return _userRepository.Update(user, id).Result;
+                User userToUpdate = FindUserByUserId(id);
+
+                userToUpdate.Email = userUpdate.Email;
+                userToUpdate.Address = userUpdate.Address;
+                userToUpdate.PhoneNumber = userUpdate.PhoneNumber;
+                userToUpdate.Zipcode = userUpdate.Zipcode;
+
+                return _userRepository.Update(userToUpdate, id).Result;
             }
             return null;
-
         }
 
         public User FindUserByEmail(string email)
@@ -71,12 +79,16 @@ namespace Services
 
         public UserDTO FindUserDTOByUserId(Guid userId)
         {
-            throw new NotImplementedException();
+            User user = FindUserByUserId(userId);
+
+            return UserDTOHelper.ToDTO(user);
         }
 
         public UserDTO FindUserDTOByEmail(string email)
         {
-            throw new NotImplementedException();
+            User user = FindUserByEmail(email);
+
+            return UserDTOHelper.ToDTO(user);
         }
     }
 }

@@ -9,9 +9,11 @@ namespace Services.Interfaces
 {
     public interface IContactService
     {
-        IEnumerable<Contact> FindContactByFamilyId(Guid userId);
+        Contact FindContactByContactId(Guid contactId);
+        IEnumerable<Contact> FindContactByFamilyId(Guid familyId);
+        IEnumerable<ContactDTO> FindContactDTOByFamilyId(Guid familyId);
         Contact AddContact(Contact address);
-        Contact UpdateContact(Contact address, Guid id);
+        Contact UpdateContact(ContactUpdateDTO addressUpdate, Guid id);
         Contact DeleteContact(Guid id);
     }
 }

@@ -109,7 +109,7 @@ namespace KiCoKalender.Controllers
             {
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-                IEnumerable<Asset> assets = AssetService.FindAssetsByFolderId(Guid.Parse(folderId));
+                IEnumerable<AssetDTO> assets = AssetService.FindAssetsDTOByFolderId(Guid.Parse(folderId));
 
                 if (assets.Any())
                 {
@@ -158,7 +158,7 @@ namespace KiCoKalender.Controllers
         [UserAuth]
         [OpenApiOperation(operationId: "UpdateAsset", tags: new[] { "asset" }, Summary = "Update an existing Asset", Description = "This updates an existing Asset.", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiParameter(name: "id", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "Id of Assets to return", Description = "Id of Assets to return", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be updated")]
+        [OpenApiRequestBody(contentType: "multipart/form-data", bodyType: typeof(TransactionUpdateDTO), Description = "Parameters", Required = true)]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "Asset details updated", Description = "Asset details updated", Example = typeof(DummyAssetExample))]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Asset not found", Description = "Asset not found")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Validation exception", Description = "Validation exception")]
@@ -175,10 +175,16 @@ namespace KiCoKalender.Controllers
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
                 try
                 {
-                    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                    Asset asset = JsonConvert.DeserializeObject<Asset>(requestBody);
+                    var parsedFormBody = await MultipartFormDataParser.ParseAsync(req.Body);
+                    var parameters = parsedFormBody.Parameters;
 
-                    Asset updatedAsset = AssetService.UpdateAsset(asset, Guid.Parse(id));
+                    AssetUpdateDTO assetUpdate = new()
+                    {
+                        Name = parameters.FirstOrDefault(x => x.Name == "name").Data,
+                        Description = parameters.FirstOrDefault(x => x.Name == "description").Data,
+                    };
+
+                    Asset updatedAsset = AssetService.UpdateAsset(assetUpdate, Guid.Parse(id));
 
                     if (updatedAsset is null)
                     {

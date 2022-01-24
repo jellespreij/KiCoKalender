@@ -118,7 +118,7 @@ namespace KiCoKalender.Controllers
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
                 // Generate output
-                IEnumerable<Transaction> transactions = TransactionService.FindTransactionByFamilyId(Guid.Parse(familyId));
+                IEnumerable<TransactionDTO> transactions = TransactionService.FindTransactionDTOByFamilyId(Guid.Parse(familyId));
 
                 if (transactions is not null)
                 {
@@ -169,7 +169,7 @@ namespace KiCoKalender.Controllers
         [UserAuth]
         [OpenApiOperation(operationId: "UpdateTransaction", tags: new[] { "transaction" }, Summary = "Update an existing transaction", Description = "This updates an existing transaction.", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiParameter(name: "id", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "Id of transaction to update", Description = "Id of transaction to update", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Asset), Required = true, Description = "Asset object that needs to be updated")]
+        [OpenApiRequestBody(contentType: "multipart/form-data", bodyType: typeof(TransactionUpdateDTO), Description = "Parameters", Required = true)]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Asset), Summary = "Transaction details updated", Description = "Transaction details updated", Example = typeof(DummyTransactionExample))]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Asset not found", Description = "Asset not found")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.MethodNotAllowed, Summary = "Validation exception", Description = "Validation exception")]
@@ -186,10 +186,18 @@ namespace KiCoKalender.Controllers
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
                 try
                 {
-                    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                    Transaction transaction = JsonConvert.DeserializeObject<Transaction>(requestBody);
+                    var parsedFormBody = await MultipartFormDataParser.ParseAsync(req.Body);
+                    var parameters = parsedFormBody.Parameters;
 
-                    Transaction updatedTransaction = TransactionService.UpdateTransaction(transaction, Guid.Parse(id));
+                    TransactionUpdateDTO transactionUpdate = new()
+                    {
+                        Name = parameters.FirstOrDefault(x => x.Name == "name").Data,
+                        FileName = parameters.FirstOrDefault(x => x.Name == "fileName").Data,
+                        Description = parameters.FirstOrDefault(x => x.Name == "description").Data,
+                        Amount = Convert.ToDouble(parameters.FirstOrDefault(x => x.Name == "amount").Data),
+                    };
+
+                    Transaction updatedTransaction = TransactionService.UpdateTransaction(transactionUpdate, Guid.Parse(id));
 
                     if (updatedTransaction is null)
                     {

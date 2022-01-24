@@ -16,6 +16,8 @@ using System.Security.Claims;
 using Auth.Attributes;
 using System;
 using Services.Interfaces;
+using HttpMultipartParser;
+using System.Linq;
 
 namespace KiCoKalender.Controllers
 {
@@ -96,7 +98,7 @@ namespace KiCoKalender.Controllers
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
                 // Generate output
-                IEnumerable<Contact> contacts = ContactService.FindContactByFamilyId(Guid.Parse(familyId));
+                IEnumerable<ContactDTO> contacts = ContactService.FindContactDTOByFamilyId(Guid.Parse(familyId));
 
                 if (contacts is not null)
                 {
@@ -147,7 +149,7 @@ namespace KiCoKalender.Controllers
         [UserAuth]
         [OpenApiOperation(operationId: "UpdateContact", tags: new[] { "contact" }, Summary = "Update an existing contact", Description = "This updates an existing contact.", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiParameter(name: "id", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "Id of contact to return", Description = "Id of contact to return", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Contact), Required = true, Description = "Contact that needs to be updated")]
+        [OpenApiRequestBody(contentType: "multipart/form-data", bodyType: typeof(ContactUpdateDTO), Description = "Parameters", Required = true)]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Contact), Summary = "Contact details updated", Description = "Contact details updated", Example = typeof(DummyContactExample))]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound, Summary = "Contact not found", Description = "Contact not found")]
@@ -165,10 +167,21 @@ namespace KiCoKalender.Controllers
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
                 try
                 {
-                    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                    Contact contact = JsonConvert.DeserializeObject<Contact>(requestBody);
+                    var parsedFormBody = await MultipartFormDataParser.ParseAsync(req.Body);
+                    var parameters = parsedFormBody.Parameters;
 
-                    Contact updatedContact = ContactService.UpdateContact(contact, Guid.Parse(id));
+                    ContactUpdateDTO contactUpdate = new()
+                    {
+                        PhoneNumber = parameters.FirstOrDefault(x => x.Name == "phoneNumber").Data,
+                        Name = parameters.FirstOrDefault(x => x.Name == "name").Data,
+                        LastName = parameters.FirstOrDefault(x => x.Name == "lastName").Data,
+                        City = parameters.FirstOrDefault(x => x.Name == "city").Data,
+                        Address = parameters.FirstOrDefault(x => x.Name == "address").Data,
+                        Postcode = parameters.FirstOrDefault(x => x.Name == "postcode").Data,
+                        Email = parameters.FirstOrDefault(x => x.Name == "email").Data,
+                    };
+
+                    Contact updatedContact = ContactService.UpdateContact(contactUpdate, Guid.Parse(id));
 
                     if (updatedContact is null)
                     {

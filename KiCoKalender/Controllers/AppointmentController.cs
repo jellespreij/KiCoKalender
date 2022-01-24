@@ -19,6 +19,7 @@ using System.Security.Claims;
 using Auth.Attributes;
 using Microsoft.Azure.Cosmos;
 using Services.Interfaces;
+using HttpMultipartParser;
 
 namespace KiCoKalender.Controllers
 {
@@ -103,7 +104,7 @@ namespace KiCoKalender.Controllers
             {
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-                IEnumerable<Appointment> appointments = AppointmentService.FindAppointmentByFamilyIdAndUserId(Guid.Parse(familyId), Guid.Parse(userId));
+                IEnumerable<AppointmentDTO> appointments = AppointmentService.FindAppointmentDTOByFamilyIdAndUserId(Guid.Parse(familyId), Guid.Parse(userId));
 
                 if (appointments.Any())
                 {
@@ -151,7 +152,7 @@ namespace KiCoKalender.Controllers
         [Function("UpdateAppointment")]
         [UserAuth]
         [OpenApiOperation(operationId: "UpdateAppointment", tags: new[] { "appointment" }, Summary = "Update an existing appointment", Description = "This updates an existing appointment.", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Appointment), Required = true, Description = "appointment that needs to be updated")]
+        [OpenApiRequestBody(contentType: "multipart/form-data", bodyType: typeof(AppointmentUpdateDTO), Description = "Parameters", Required = true)]
         [OpenApiParameter(name: "id", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "Id of appointemnt to return", Description = "Id of appointment to return", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Appointment), Summary = "appointment details updated", Description = "appointment details updated", Example = typeof(DummyAppointmentExample))]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid appointment supplied", Description = "Invalid appointment supplied")]
@@ -169,10 +170,24 @@ namespace KiCoKalender.Controllers
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
                 try
                 {
-                    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                    Appointment appointment = JsonConvert.DeserializeObject<Appointment>(requestBody);
+                    var parsedFormBody = await MultipartFormDataParser.ParseAsync(req.Body);
+                    var parameters = parsedFormBody.Parameters;
 
-                    Appointment updatedAppointment = AppointmentService.UpdateAppointment(appointment, Guid.Parse(id));
+                    AppointmentUpdateDTO appointmentUpdate = new()
+                    {
+                        Invited = (Invited)Enum.Parse(typeof(Invited), (parameters.FirstOrDefault(x => x.Name == "invited").Data)),
+                        Name = parameters.FirstOrDefault(x => x.Name == "name").Data,
+                        Description = parameters.FirstOrDefault(x => x.Name == "description").Data,
+                        LocationDropofId = Guid.Parse(parameters.FirstOrDefault(x => x.Name == "locationDropofId").Data),
+                        LocationPickupId = Guid.Parse(parameters.FirstOrDefault(x => x.Name == "locationPickupId").Data),
+                        LocationId = Guid.Parse(parameters.FirstOrDefault(x => x.Name == "locationId").Data),
+                        StartTime = DateTime.Parse(parameters.FirstOrDefault(x => x.Name == "startTime").Data),
+                        EndTime = DateTime.Parse(parameters.FirstOrDefault(x => x.Name == "endTime").Data),
+                        Date = DateTime.Parse(parameters.FirstOrDefault(x => x.Name == "date").Data),
+                        Privacy = bool.Parse(parameters.FirstOrDefault(x => x.Name == "privacy").Data)
+                    };
+
+                    Appointment updatedAppointment = AppointmentService.UpdateAppointment(appointmentUpdate, Guid.Parse(id));
 
                     if (updatedAppointment is null)
                     {

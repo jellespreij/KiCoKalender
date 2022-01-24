@@ -18,6 +18,7 @@ using Auth.Interfaces;
 using System;
 using System.Collections.Generic;
 using Services.Interfaces;
+using HttpMultipartParser;
 
 namespace KiCoKalender.Controllers
 {
@@ -196,7 +197,6 @@ namespace KiCoKalender.Controllers
         [UserAuth]
         [OpenApiOperation(operationId: "updateUser", tags: new[] { "user" }, Summary = "Update an existing user", Description = "This updates an existing user.", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiParameter(name: "id", In = ParameterLocation.Query, Required = true, Type = typeof(Guid), Summary = "Id of user to return", Description = "Id of user to return", Visibility = OpenApiVisibilityType.Important)]
-        //[OpenApiRequestBody(contentType: "application/json", bodyType: typeof(User), Required = true, Description = "User that needs to be updated")]
         [OpenApiRequestBody(contentType: "multipart/form-data", bodyType: typeof(UserUpdateDTO), Description = "Parameters", Required = true)]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(User), Summary = "User details updated", Description = "User details updated", Example = typeof(DummyUserExample))]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Invalid ID supplied", Description = "Invalid ID supplied")]
@@ -214,10 +214,18 @@ namespace KiCoKalender.Controllers
                 HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
                 try
                 {
-                    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                    User user = JsonConvert.DeserializeObject<User>(requestBody);
+                    var parsedFormBody = await MultipartFormDataParser.ParseAsync(req.Body);
+                    var parameters = parsedFormBody.Parameters;
 
-                    User updatedUser = UserService.UpdateUser(user, Guid.Parse(id), Guid.Parse(currentUser.FindFirst(ClaimTypes.Sid).Value));
+                    UserUpdateDTO userUpdate = new()
+                    {
+                        Email   = parameters.FirstOrDefault(x => x.Name == "email").Data,
+                        Address = parameters.FirstOrDefault(x => x.Name == "address").Data,
+                        PhoneNumber = parameters.FirstOrDefault(x => x.Name == "phoneNumber").Data,
+                        Zipcode = parameters.FirstOrDefault(x => x.Name == "zipcode").Data,
+                    };
+
+                    User updatedUser = UserService.UpdateUser(userUpdate, Guid.Parse(id), Guid.Parse(currentUser.FindFirst(ClaimTypes.Sid).Value));
 
                     if (updatedUser is null)
                     {

@@ -10,9 +10,11 @@ namespace Services.Interfaces
 {
     public interface IAssetService
     {
+        Asset FindAssetByAssetId(Guid assetId);
         IEnumerable<Asset> FindAssetsByFolderId(Guid folderId);
+        IEnumerable<AssetDTO> FindAssetsDTOByFolderId(Guid folderId);
         Task<Asset> AddAsset(FilePart file, Guid folderId);
         Task<Asset> DeleteAsset(Guid id);
-        Asset UpdateAsset(Asset asset, Guid id);
+        Asset UpdateAsset(AssetUpdateDTO assetUpdate, Guid id);
     }
 }

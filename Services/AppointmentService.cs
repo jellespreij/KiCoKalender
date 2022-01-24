@@ -1,4 +1,5 @@
 ﻿using Models;
+using Models.Helpers;
 using Repositories;
 using Repositories.Interfaces;
 using Services.Interfaces;
@@ -19,6 +20,11 @@ namespace Services
             _appointmentRepository = appointmentRepository;   
         }
 
+        public Appointment FindAppointmentByAppointmentId(Guid appointmentId)
+        {
+            return _appointmentRepository.GetSingle(appointmentId);
+        }
+
         public Appointment AddAppointment(Appointment appointment)
         {
             return _appointmentRepository.Add(appointment).Result;
@@ -33,10 +39,30 @@ namespace Services
         {
             return _appointmentRepository.FindBy(e => e.FamilyId == familyId && (e.Privacy == false || (e.UserId == userId && e.Privacy == true)));
         }
-
-        public Appointment UpdateAppointment(Appointment appointment, Guid id)
+        
+        public IEnumerable<AppointmentDTO> FindAppointmentDTOByFamilyIdAndUserId(Guid familyId, Guid userId)
         {
-            return _appointmentRepository.Update(appointment, id).Result;
+            IEnumerable<Appointment> appointments = FindAppointmentByFamilyIdAndUserId(familyId, userId);
+
+            return AppointmentDTOHelper.ToDTO(appointments);
+        }
+
+        public Appointment UpdateAppointment(AppointmentUpdateDTO appointmentUpdate, Guid id)
+        {
+            Appointment appointmentToUpdate = FindAppointmentByAppointmentId(id);
+
+            appointmentToUpdate.Invited = appointmentUpdate.Invited;
+            appointmentToUpdate.Name = appointmentUpdate.Name;
+            appointmentToUpdate.Description = appointmentUpdate.Description;
+            appointmentToUpdate.LocationPickupId = appointmentUpdate.LocationPickupId;
+            appointmentToUpdate.LocationDropofId = appointmentUpdate.LocationDropofId;
+            appointmentToUpdate.LocationId = appointmentUpdate.LocationId;
+            appointmentToUpdate.StartTime = appointmentUpdate.StartTime;
+            appointmentToUpdate.EndTime = appointmentUpdate.EndTime;
+            appointmentToUpdate.Date = appointmentUpdate.Date;
+            appointmentToUpdate.Privacy = appointmentUpdate.Privacy;
+           
+            return _appointmentRepository.Update(appointmentToUpdate, id).Result;
         }
     }
 }
