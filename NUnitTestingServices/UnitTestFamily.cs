@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Moq;
 using System.Linq;
 using Repositories.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace NUnitTestingServices
 {
@@ -14,6 +15,7 @@ namespace NUnitTestingServices
     {
         private Mock<IFamilyRepository> _familyRepositoryMock;
         private Mock<IUserRepository> _userRepositoryMock;
+        private Mock<IConfiguration> _configurationMock;
         private FamilyService _familyService;
         private List<Family> _MockLstFamily;
         private User _MockUser;
@@ -23,10 +25,11 @@ namespace NUnitTestingServices
         {
             _familyRepositoryMock = new Mock<IFamilyRepository>();
             _userRepositoryMock = new Mock<IUserRepository>();
+            _configurationMock = new Mock<IConfiguration>();
 
-            _familyService = new FamilyService(_familyRepositoryMock.Object, _userRepositoryMock.Object);
+            _familyService = new FamilyService(_familyRepositoryMock.Object, _userRepositoryMock.Object, _configurationMock.Object);
 
-            _MockUser = new User(Guid.NewGuid(), "Cyprus", "Cypruson", "email.email@gmail.com", "password1", Role.Child, DateTime.Now, "straat 123", "1234AB");
+            _MockUser = new User(Guid.NewGuid(), "Cyprus", "Cypruson", "email.email@gmail.com", "password1", Role.Child, "test", "straat 123", "1234AB");
 
             _MockLstFamily = new List<Family>();
             Family familyOne = new Family(Guid.NewGuid(), "De barends");
@@ -90,7 +93,7 @@ namespace NUnitTestingServices
         public void Calling_AddUserToFamily_ON_ServiceLayer_Should_Call_FamilyRepository_and_addUser()
         {
             //Arrange
-            User userAdd = new User(Guid.NewGuid(), "Jos", "dag", "crete@hotmail.com", "HeelGeheimwachtwoord!", Role.Parent, DateTime.Now, "de hogenveen 12", "2375HY");
+            User userAdd = new User(Guid.NewGuid(), "Jos", "dag", "crete@hotmail.com", "HeelGeheimwachtwoord!", Role.Parent, "test", "de hogenveen 12", "2375HY");
             _familyRepositoryMock.Setup(m => m.AddUserToFamily(userAdd, _MockLstFamily[1].Id));
 
             //act

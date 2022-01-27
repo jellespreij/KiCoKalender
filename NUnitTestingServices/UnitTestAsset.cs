@@ -19,6 +19,8 @@ namespace NUnitTestingServices
         private List<Asset> _MockLstAssets;
         private BlobService _blobService;
         private Folder _MockFolder;
+        private AssetDTO _MockAssetDTO;
+        private AssetUpdateDTO _MockAssetUpdateDTO;
         private ILogger Logger { get; }
 
         [SetUp]
@@ -32,6 +34,9 @@ namespace NUnitTestingServices
 
             Asset assetOne = new Asset(Guid.NewGuid(), "picture.png", "its a picture", DateTime.Now, "-url-", Guid.NewGuid().ToString());
             _MockLstAssets.Add(assetOne);
+
+            _MockAssetDTO = new AssetDTO();
+            _MockAssetUpdateDTO = new AssetUpdateDTO();
 
             _MockFolder = new Folder(Guid.NewGuid(), "images");
         }
@@ -52,22 +57,6 @@ namespace NUnitTestingServices
             Assert.IsNotNull(result);
             //Check that the GetSingle method was called once
             _assetRepositoryMock.Verify(c => c.FindBy(e => e.FolderId == folderId), Times.Once);
-        }
-
-        [Test]
-        public void Calling_UpdateUserByUserId_ON_ServiceLayer_Should_Call_UserRepository_and_Return_updated_User()
-        {
-            //Arrange
-            _assetRepositoryMock.Setup(m => m.Update(_MockLstAssets[0], _MockLstAssets[0].Id).Result).Returns(_MockLstAssets[0]);
-
-            //act
-            Asset result = _assetService.UpdateAsset(_MockLstAssets[0], _MockLstAssets[0].Id);
-
-            //Assert
-            Assert.That(result, Is.InstanceOf(typeof(Asset)));
-
-            //Check that the delete method was called once
-            _assetRepositoryMock.Verify(c => c.Update(_MockLstAssets[0], _MockLstAssets[0].Id), Times.Once);
         }
 
         [TearDown]

@@ -17,6 +17,8 @@ namespace NUnitTestingServices
         private Mock<IFamilyRepository> _familyRepositoryMock;
         private UserService _userService;
         private List<User> _MockLstUsers;
+        private UserDTO _MockUserDTO;
+        private UserUpdateDTO _MockUserUpdateDTO;
         private ILogger Logger { get; }
         [SetUp]
         public void Setup()
@@ -28,6 +30,9 @@ namespace NUnitTestingServices
             _MockLstUsers = new List<User>();
             User userOne = new User(Guid.NewGuid(), "Cyprus", "Cypruson", "email.email@gmail.com", "password1", Role.Child, "straat 123", "0652148596", "1234AB");
             User userTwo = new User(Guid.NewGuid(), "Crete", "Alebllo","crete@hotmail.com", "HeelGeheimwachtwoord!", Role.Parent, "de hogenveen 12", "0652148596", "2375HY");
+
+            _MockUserDTO = new UserDTO();
+            _MockUserUpdateDTO = new UserUpdateDTO();
 
             _MockLstUsers.Add(userOne);
             _MockLstUsers.Add(userTwo);
@@ -95,22 +100,6 @@ namespace NUnitTestingServices
 
             //Check that the delete method was called once
             _userRepositoryMock.Verify(c => c.Delete(_MockLstUsers[0].Id), Times.Once);
-        }
-
-        [Test]
-        public void Calling_UpdateUserByUserId_ON_ServiceLayer_Should_Call_UserRepository_and_Return_updated_User()
-        {
-            //Arrange
-            _userRepositoryMock.Setup(m => m.Update(_MockLstUsers[0], _MockLstUsers[0].Id).Result).Returns(_MockLstUsers[0]);
-
-            //act
-            User result = _userService.UpdateUser(_MockLstUsers[0], _MockLstUsers[0].Id, _MockLstUsers[0].Id);
-
-            //Assert
-            Assert.That(result, Is.InstanceOf(typeof(User)));
-
-            //Check that the delete method was called once
-            _userRepositoryMock.Verify(c => c.Update(_MockLstUsers[0], _MockLstUsers[0].Id), Times.Once);
         }
 
         [TearDown]

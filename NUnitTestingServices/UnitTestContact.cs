@@ -16,6 +16,8 @@ namespace NUnitTestingServices
         private Mock<IContactRepository> _contactRepositoryMock;
         private ContactService _contactService;
         private List<Contact> _MockLstContacts;
+        private ContactDTO _MockContactDTO;
+        private ContactUpdateDTO _MockContactUpdateDTO;
         [SetUp]
         public void Setup()
         {
@@ -25,6 +27,9 @@ namespace NUnitTestingServices
             _MockLstContacts = new List<Contact>();
             Contact contactOne = new Contact(Guid.NewGuid(), Guid.NewGuid(), "0658652143", ContactType.family, "Oom bert", "Amsterdam", "De hagenland 11", "2154LO", Guid.NewGuid().ToString());
             Contact contactTwo = new Contact(Guid.NewGuid(), Guid.NewGuid(), "0674582136", ContactType.family, "Oom jan", "Zaandam", "De korf 11", "2154PO", Guid.NewGuid().ToString());
+
+            _MockContactDTO = new ContactDTO();
+            _MockContactUpdateDTO = new ContactUpdateDTO();
 
             _MockLstContacts.Add(contactOne);
             _MockLstContacts.Add(contactTwo);
@@ -78,22 +83,6 @@ namespace NUnitTestingServices
 
             //Check that the delete method was called once
             _contactRepositoryMock.Verify(c => c.Delete(_MockLstContacts[0].Id), Times.Once);
-        }
-
-        [Test]
-        public void Calling_UpdateContact_ON_ServiceLayer_Should_Call_ContactRepository_and_Return_updated_Contact()
-        {
-            //Arrange
-            _contactRepositoryMock.Setup(m => m.Update(_MockLstContacts[1], _MockLstContacts[1].Id).Result).Returns(_MockLstContacts[1]);
-
-            //act
-            Contact result = _contactService.UpdateContact(_MockLstContacts[1], _MockLstContacts[1].Id);
-
-            //Assert
-            Assert.That(result, Is.InstanceOf(typeof(Contact)));
-
-            //Check that the delete method was called once
-            _contactRepositoryMock.Verify(c => c.Update(_MockLstContacts[1], _MockLstContacts[1].Id), Times.Once);
         }
 
         [TearDown]
