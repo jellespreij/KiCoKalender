@@ -62,6 +62,12 @@ namespace Models
         [OpenApiProperty(Description = "Gets or sets created date.")]
         public DateTime Created { get; set; }
 
+        [OpenApiProperty(Description = "Gets or sets created date.")]
+        public int LoggingAttempts { get; set; }
+
+        [OpenApiProperty(Description = "Gets or sets created date.")]
+        public DateTime LastLoginTry { get; set; }
+
         public User()
         {
 
@@ -79,6 +85,7 @@ namespace Models
             PhoneNumber = phoneNumber;
             Zipcode = zipcode;
             Created = DateTime.Now;
+            LoggingAttempts = 0;
         }
     }
 

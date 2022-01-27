@@ -64,19 +64,39 @@ namespace Services
         public async Task<LoginResult> CreateToken(Login login)
         {
             User userObject = await _authRepository.FindUser(e => e.Email == login.Email);
-            if (userObject is null || !BCryptNet.Verify(login.Password, userObject.Password))
+            if (userObject is null)
             {
                 return null;
             }
-            else
-            {
-                JwtSecurityToken Token = await CreateToken(new Claim[] {
-                new Claim(ClaimTypes.Role, "User"),
-                new Claim(ClaimTypes.Sid, userObject.Id.ToString()),
-                new Claim(ClaimTypes.GroupSid, userObject.FamilyId.ToString())
-                });
 
-                return new LoginResult(Token);
+            if (userObject.LoggingAttempts <= 3 || (userObject.LoggingAttempts > 3 && userObject.LastLoginTry.AddMinutes(5) <= DateTime.Now))
+            {
+                if (BCryptNet.Verify(login.Password, userObject.Password))
+                {
+
+                    userObject.LoggingAttempts = 0;
+                    userObject.LastLoginTry = DateTime.Now;
+                    await _authRepository.Update(userObject, userObject.Id);
+
+                    JwtSecurityToken Token = await CreateToken(new Claim[] {
+                        new Claim(ClaimTypes.Role, "User"),
+                        new Claim(ClaimTypes.Sid, userObject.Id.ToString()),
+                        new Claim(ClaimTypes.GroupSid, userObject.FamilyId.ToString())
+                    });
+
+                    return new LoginResult(Token);
+                }
+                else
+                {
+                    userObject.LoggingAttempts++;
+                    userObject.LastLoginTry = DateTime.Now;
+                    await _authRepository.Update(userObject, userObject.Id);
+                    return null;
+                }
+            }
+            else 
+            {
+                return null;
             }
 
 

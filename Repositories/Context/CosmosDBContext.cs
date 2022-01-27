@@ -25,6 +25,7 @@ namespace Repositories.Context
                 Environment.GetEnvironmentVariable("CosmosEndUrl"), Environment.GetEnvironmentVariable("CosmosDBString"),
                 Environment.GetEnvironmentVariable("CosmosDbName"));
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultContainer("Containers");
