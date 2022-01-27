@@ -69,12 +69,12 @@ namespace Services
                 return null;
             }
 
-            if (userObject.LoggingAttempts <= 3 || (userObject.LoggingAttempts > 3 && userObject.LastLoginTry.AddMinutes(5) <= DateTime.Now))
+            if (userObject.LoginAttempts <= 3 || (userObject.LoginAttempts > 3 && userObject.LastLoginTry.AddMinutes(5) <= DateTime.Now))
             {
                 if (BCryptNet.Verify(login.Password, userObject.Password))
                 {
 
-                    userObject.LoggingAttempts = 0;
+                    userObject.LoginAttempts = 0;
                     userObject.LastLoginTry = DateTime.Now;
                     await _authRepository.Update(userObject, userObject.Id);
 
@@ -88,7 +88,7 @@ namespace Services
                 }
                 else
                 {
-                    userObject.LoggingAttempts++;
+                    userObject.LoginAttempts++;
                     userObject.LastLoginTry = DateTime.Now;
                     await _authRepository.Update(userObject, userObject.Id);
                     return null;

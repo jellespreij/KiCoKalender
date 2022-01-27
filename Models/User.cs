@@ -63,7 +63,7 @@ namespace Models
         public DateTime Created { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets created date.")]
-        public int LoggingAttempts { get; set; }
+        public int LoginAttempts { get; set; }
 
         [OpenApiProperty(Description = "Gets or sets created date.")]
         public DateTime LastLoginTry { get; set; }
@@ -85,7 +85,7 @@ namespace Models
             PhoneNumber = phoneNumber;
             Zipcode = zipcode;
             Created = DateTime.Now;
-            LoggingAttempts = 0;
+            LoginAttempts = 0;
         }
     }
 
